@@ -1,0 +1,10 @@
+export type CampaignId = string;
+export type BattleId = string;
+export type BattleStageId = string;
+export type SideId = string;
+export type UnitId = string;
+export type UnitTypeId = string;
+export type CommanderId = string;
+export type TerrainId = string;
+export type AssetId = string;
+export type ContentId = string;

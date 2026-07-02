@@ -1,0 +1,46 @@
+import type { BattleScenario, BattleState, BattleResult } from "../battle/battle-types";
+
+export function getAliveUnitsBySide(state: BattleState, sideId: string) {
+  return Object.values(state.units).filter(
+    (unit) => unit.sideId === sideId && unit.status !== "destroyed" && unit.status !== "routed",
+  );
+}
+
+export function checkVictory(scenario: BattleScenario, state: BattleState): BattleResult | null {
+  const aliveBySide = scenario.sides.map((side) => ({ side, alive: getAliveUnitsBySide(state, side.id).length }));
+  const defeatedSide = aliveBySide.find((entry) => entry.alive === 0);
+
+  if (!defeatedSide) {
+    const surviveCondition = scenario.victory.find(
+      (condition) => condition.type === "survive_turns" && condition.sideId === state.playerSideId && state.turn >= condition.turns,
+    );
+    if (!surviveCondition) return null;
+  }
+
+  const winnerSideId = defeatedSide
+    ? scenario.sides.find((side) => side.id !== defeatedSide.side.id)?.id ?? state.playerSideId
+    : state.playerSideId;
+
+  const playerAlive = getAliveUnitsBySide(state, state.playerSideId).length;
+  const totalPlayer = Object.values(state.units).filter((unit) => unit.sideId === state.playerSideId).length;
+  const survivalRate = totalPlayer === 0 ? 0 : playerAlive / totalPlayer;
+  const rank = survivalRate > 0.8 ? "S" : survivalRate > 0.6 ? "A" : survivalRate > 0.4 ? "B" : survivalRate > 0.2 ? "C" : "D";
+
+  return {
+    winnerSideId,
+    playerSideId: state.playerSideId,
+    rank,
+    chronicle: buildChronicle(scenario, state, winnerSideId, rank),
+  };
+}
+
+function buildChronicle(scenario: BattleScenario, state: BattleState, winnerSideId: string, rank: BattleResult["rank"]): string[] {
+  const winner = scenario.sides.find((side) => side.id === winnerSideId)?.name ?? "Неизвестная сторона";
+  const defeated = scenario.sides.filter((side) => side.id !== winnerSideId).map((side) => side.name).join(", ");
+  return [
+    `${winner} удерживает поле боя.`,
+    `${defeated} теряет строй и отходит.`,
+    `Битва завершена на ${state.turn} ходу.`,
+    `Итоговый ранг: ${rank}.`,
+  ];
+}
