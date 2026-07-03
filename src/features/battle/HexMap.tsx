@@ -1,3 +1,4 @@
+import crecyStageMap from "../../assets/maps/crecy-1346-stage-advance.png";
 import type { BattleScenario, BattleStage, BattleState, Unit } from "../../core/battle/battle-types";
 import type { HexCoord } from "../../core/hex/hex-types";
 import { hexKey, sameHex } from "../../core/hex/hex-utils";
@@ -48,7 +49,7 @@ export function HexMap({
   const unitsByHex = new Map(Object.values(state.units).map((unit) => [hexKey(unit.position), unit]));
   const terrainById = new Map(scenario.terrain.map((terrain) => [terrain.id, terrain]));
   const isPlayerTurn = state.activeSideId === state.playerSideId;
-  const hasStageMap = scenario.id === "crecy-1346" && activeStage.id === "advance";
+  const backgroundMap = scenario.id === "crecy-1346" ? crecyStageMap : null;
 
   function handleTileClick(coord: HexCoord) {
     onInspectTile(coord);
@@ -119,16 +120,24 @@ export function HexMap({
   const height = scenario.map.height * HEX_Y_STEP + HEX_H + MAP_PADDING_Y * 2;
 
   return (
-    <section className={`map-frame ${hasStageMap ? "has-stage-map-frame" : ""}`}>
+    <section className={`map-frame ${backgroundMap ? "has-stage-map-frame" : ""}`}>
       <div className="stage-summary">
         <strong>{activeStage.title}</strong>
         <span>{activeStage.summary}</span>
       </div>
 
       <div
-        className={`hex-map battle-${toClassToken(scenario.id)} stage-${toClassToken(activeStage.id)} ${hasStageMap ? "has-stage-map" : ""}`}
+        className={`hex-map battle-${toClassToken(scenario.id)} stage-${toClassToken(activeStage.id)} ${backgroundMap ? "has-stage-map" : ""}`}
         style={{ width, height }}
       >
+        {backgroundMap ? (
+          <div
+            className="hex-map-background-layer"
+            aria-hidden="true"
+            style={{ backgroundImage: `url(${backgroundMap})` }}
+          />
+        ) : null}
+
         {scenario.map.tiles.map((tile) => {
           const key = hexKey(tile.coord);
           const unit = unitsByHex.get(key);

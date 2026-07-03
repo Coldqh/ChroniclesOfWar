@@ -1,2 +1,2 @@
-export const APP_VERSION = "v0.1.6";
-export const APP_BUILD_LABEL = "Map Background";
+export const APP_VERSION = "v0.1.7";
+export const APP_BUILD_LABEL = "Map Layer Fix";

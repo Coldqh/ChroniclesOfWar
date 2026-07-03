@@ -24,38 +24,52 @@
   color: inherit;
 }
 
-/* Crécy stage 1 map background, pre-fitted for current 12x9 hex layout. */
+/* Ensure map background stays the lowest visual layer and remains visible across the whole battle. */
 .hex-map.has-stage-map {
+  position: relative;
   isolation: isolate;
   overflow: hidden;
-  background-image:
-    linear-gradient(rgba(38, 22, 10, 0.03), rgba(38, 22, 10, 0.03)),
-    url("../assets/maps/crecy-1346-stage-advance.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100% 100%;
   border: 2px solid rgba(78, 44, 18, 0.42);
   box-shadow:
     inset 0 0 0 1px rgba(255, 239, 190, 0.24),
     inset 0 0 32px rgba(45, 25, 10, 0.18);
 }
 
+.hex-map.has-stage-map .hex-map-background-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
 .hex-map.has-stage-map .hex-tile {
+  position: absolute;
+  z-index: 1;
   background: rgba(255, 239, 190, 0.035);
   box-shadow:
-    inset 0 0 0 1px rgba(42, 24, 10, 0.25),
+    inset 0 0 0 1px rgba(42, 24, 10, 0.28),
     inset 0 0 10px rgba(255, 239, 190, 0.06);
   backdrop-filter: none;
 }
 
 .hex-map.has-stage-map .hex-tile:hover {
-  background: rgba(255, 239, 190, 0.12);
+  background: rgba(255, 239, 190, 0.14);
 }
 
 .hex-map.has-stage-map .hex-label {
+  position: relative;
+  z-index: 2;
   color: rgba(42, 24, 10, 0.72);
   font-weight: 900;
   text-shadow: 0 1px 0 rgba(255, 239, 190, 0.5);
+}
+
+.hex-map.has-stage-map .unit-token {
+  position: relative;
+  z-index: 3;
 }
 
 .hex-map.has-stage-map .hex-tile.out-stage {
@@ -64,25 +78,44 @@
 }
 
 .hex-map.has-stage-map .hex-tile.can-move {
-  background: rgba(84, 133, 195, 0.18);
+  background: rgba(84, 133, 195, 0.22);
   box-shadow:
-    inset 0 0 0 2px rgba(69, 124, 196, 0.85),
-    0 0 14px rgba(69, 124, 196, 0.32);
+    inset 0 0 0 2px rgba(69, 124, 196, 0.95),
+    0 0 14px rgba(69, 124, 196, 0.36);
 }
 
 .hex-map.has-stage-map .hex-tile.can-target {
-  background: rgba(178, 54, 38, 0.18);
+  background: rgba(178, 54, 38, 0.24);
   box-shadow:
-    inset 0 0 0 2px rgba(163, 44, 31, 0.9),
-    0 0 14px rgba(163, 44, 31, 0.35);
+    inset 0 0 0 2px rgba(163, 44, 31, 0.95),
+    0 0 14px rgba(163, 44, 31, 0.4);
 }
 
 .hex-map.has-stage-map .hex-tile.selected {
-  background: rgba(230, 188, 91, 0.24);
+  background: rgba(230, 188, 91, 0.28);
   outline: none;
   box-shadow:
-    inset 0 0 0 3px rgba(229, 183, 83, 0.95),
+    inset 0 0 0 3px rgba(229, 183, 83, 0.98),
     0 0 18px rgba(229, 183, 83, 0.5);
+}
+
+/* Make bottom menu strip match the current theme instead of fixed brown. */
+.bottom-nav {
+  border: 2px solid rgba(115, 67, 26, 0.38);
+  background:
+    linear-gradient(180deg, rgba(242, 221, 176, 0.96), rgba(193, 151, 89, 0.92));
+  box-shadow: 0 10px 24px rgba(67, 35, 13, 0.18);
+}
+
+.bottom-nav button {
+  border: 1px solid rgba(115, 67, 26, 0.25);
+  color: #5b2b14;
+  background: rgba(255, 245, 215, 0.52);
+}
+
+.bottom-nav button.active {
+  color: #fff1c0;
+  background: linear-gradient(180deg, #b6452b, #7e1e17);
 }
 
 /* Dark mode */
@@ -178,10 +211,11 @@
 }
 
 [data-theme="dark"] .hex-map.has-stage-map {
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.22)),
-    url("../assets/maps/crecy-1346-stage-advance.png");
   border-color: rgba(206, 164, 84, 0.28);
+}
+
+[data-theme="dark"] .hex-map.has-stage-map .hex-map-background-layer {
+  filter: brightness(0.78) saturate(0.92);
 }
 
 [data-theme="dark"] .hex-map.has-stage-map .hex-tile {
@@ -218,6 +252,23 @@
 [data-theme="dark"] .objective-row span,
 [data-theme="dark"] .stage-objective span {
   color: rgba(239, 227, 197, 0.68);
+}
+
+[data-theme="dark"] .bottom-nav {
+  border-color: rgba(206, 164, 84, 0.28);
+  background: linear-gradient(180deg, rgba(20, 20, 22, 0.98), rgba(6, 6, 7, 0.98));
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .bottom-nav button {
+  border-color: rgba(206, 164, 84, 0.22);
+  background: rgba(255, 255, 255, 0.04);
+  color: #efe3c5;
+}
+
+[data-theme="dark"] .bottom-nav button.active {
+  color: #070707;
+  background: linear-gradient(180deg, #e5bd67, #9b672e);
 }
 
 @media (max-width: 980px) {
