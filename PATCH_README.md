@@ -1,24 +1,36 @@
-# PATCH MODE — Battle Readability + Control UX
+# PATCH MODE — No Actions Static Docs Deploy
 
-Replace files in `C:\ChroniclesOfWar` with files from this archive.
+Причина красного креста:
+- `.github/workflows/build-docs.yml` запускает GitHub Actions.
+- Workflow пересобирает `docs` и пушит обратно в `main`.
+- Это создаёт лишние красные статусы, конфликты и diverged branch.
 
-Changed:
-- src/features/battle/BattleScreen.tsx
-- src/features/battle/HexMap.tsx
-- src/features/battle/BattleHud.tsx
-- src/features/battle/UnitPanel.tsx
-- src/features/battle/CombatPreviewPanel.tsx
-- src/features/battle/BattleReadability.css
+Рабочие проекты у пользователя устроены проще:
+- `main`
+- `index.html`
+- относительные пути
+- без Vite Pages artifact
+- без auto-commit workflow
 
-After replacing:
+Для ChroniclesOfWar оставляем:
+- Vite build локально
+- `npm run docs:build`
+- GitHub Pages: `main / docs`
+- никаких Actions
+
+Как применить:
+
 ```powershell
 cd C:\ChroniclesOfWar
-npm run build
-npm run docs:build
-
-git add .
-git commit -m "Improve battle readability and control UX"
-git push origin main
+.\fix-static-docs-deploy.ps1
 ```
 
-Do not change Pages settings.
+Если PowerShell блокирует запуск:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\fix-static-docs-deploy.ps1
+```
+
+После этого:
+- Settings -> Pages -> Deploy from branch -> main -> /docs
+- Actions можно игнорировать: новых запусков быть не должно.

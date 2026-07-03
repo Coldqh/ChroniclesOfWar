@@ -11,9 +11,7 @@ console.log("Dist folder:", distDir);
 console.log("Docs folder:", docsDir);
 
 if (!existsSync(distDir)) {
-  throw new Error(
-    "dist folder was not found. Run npm run build first, or use npm run docs:build."
-  );
+  throw new Error("dist folder was not found. Run npm run build first, or use npm run docs:build.");
 }
 
 rmSync(docsDir, { recursive: true, force: true });

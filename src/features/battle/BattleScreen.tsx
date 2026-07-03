@@ -61,14 +61,6 @@ export function BattleScreen({ scenario, state, setState, onExit, onRestart }: B
     setState((current) => (current ? applyBattleCommand(scenario, current, command) : current));
   }
 
-  function handleMove(unitId: string, to: HexCoord) {
-    dispatch({ type: "MOVE_UNIT", unitId, to });
-  }
-
-  function handleAttack(attackerId: string, targetId: string) {
-    dispatch({ type: "ATTACK_UNIT", attackerId, targetId });
-  }
-
   const playerWon = state.result?.winnerSideId === state.playerSideId;
 
   if (state.phase === "finished" && state.result) {
@@ -107,8 +99,8 @@ export function BattleScreen({ scenario, state, setState, onExit, onRestart }: B
           movementRange={movementRange}
           targetsInRange={targetsInRange}
           onSelectUnit={(unitId) => dispatch({ type: "SELECT_UNIT", unitId })}
-          onMove={handleMove}
-          onAttack={handleAttack}
+          onMove={(unitId, to) => dispatch({ type: "MOVE_UNIT", unitId, to })}
+          onAttack={(attackerId, targetId) => dispatch({ type: "ATTACK_UNIT", attackerId, targetId })}
           onBattleMessage={setBattleMessage}
           onInspectTile={setInspectedCoord}
         />
