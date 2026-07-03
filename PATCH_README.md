@@ -1,17 +1,17 @@
-# PATCH MODE — Terrain Effects v1 + Black UI + Version v0.1.3
+# PATCH MODE — Manuscript Campaign UI v0.1.4
 
 Changed files:
 - package.json
 - src/app/version.ts
 - src/main.tsx
-- src/app/BlackTheme.css
-- src/core/battle/battle-types.ts
-- src/data/terrain/terrain-registry.ts
-- src/core/combat/terrain-combat.ts
-- src/core/combat/combat-preview.ts
+- src/app/ManuscriptTheme.css
 - src/features/menu/MainMenu.tsx
-- src/features/battle/BattleHud.tsx
-- src/features/battle/BattleScreen.tsx
+- src/features/battle-select/BattleSelectScreen.tsx
+- src/features/side-select/SideSelectScreen.tsx
+
+Note:
+- `src/app/BlackTheme.css` is not imported anymore.
+- You can delete it later if you want, but this patch only replaces/adds files.
 
 Apply into C:\ChroniclesOfWar, then run:
 
@@ -20,6 +20,6 @@ cd C:\ChroniclesOfWar
 npm run build
 npm run docs:build
 git add -A
-git commit -m "Add terrain effects and black UI v0.1.3"
+git commit -m "Add manuscript campaign UI v0.1.4"
 git push origin main
 ```
