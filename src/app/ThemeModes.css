@@ -24,7 +24,7 @@
   color: inherit;
 }
 
-/* Image-underlay maps: the art owns the visible grid; game tiles become transparent hitboxes. */
+/* Map art is underlay. Game owns the visible grid and hitboxes. */
 .hex-map.has-stage-map {
   position: relative;
   isolation: isolate;
@@ -53,8 +53,17 @@
   position: absolute;
   z-index: 1;
   background: transparent;
-  box-shadow: none;
   backdrop-filter: none;
+}
+
+.hex-map.has-stage-map.show-grid-lines .hex-tile {
+  box-shadow:
+    inset 0 0 0 1px rgba(50, 30, 12, 0.58),
+    inset 0 0 0 2px rgba(220, 172, 72, 0.14);
+}
+
+.hex-map.has-stage-map.hide-grid-lines .hex-tile {
+  box-shadow: none;
 }
 
 .hex-map.has-stage-map.hide-hex-labels .hex-label {
@@ -99,7 +108,7 @@
   background: rgba(255, 239, 190, 0.035);
 }
 
-/* Bottom nav now follows the active theme instead of staying fixed brown. */
+/* Bottom nav follows active theme. */
 .bottom-nav {
   border: 2px solid rgba(115, 67, 26, 0.38);
   background:
@@ -216,6 +225,12 @@
 
 [data-theme="dark"] .hex-map.has-stage-map {
   border-color: rgba(206, 164, 84, 0.28);
+}
+
+[data-theme="dark"] .hex-map.has-stage-map.show-grid-lines .hex-tile {
+  box-shadow:
+    inset 0 0 0 1px rgba(239, 227, 197, 0.35),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.22);
 }
 
 [data-theme="dark"] .hex-map.has-stage-map .hex-tile:hover {

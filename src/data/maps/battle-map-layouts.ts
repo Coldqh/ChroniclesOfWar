@@ -11,18 +11,15 @@ export const DEFAULT_HEX_METRICS: HexVisualMetrics = {
 
 export const battleMapLayouts: BattleMapLayout[] = [
   {
-    id: "crecy-1346-hex-art-map",
+    id: "crecy-1346-game-grid-map",
     scenarioId: "crecy-1346",
     mode: "image-underlay",
     backgroundClassName: "map-bg-crecy-1346",
     showTerrainFill: false,
     showHexLabels: false,
-    metrics: {
-      ...DEFAULT_HEX_METRICS,
-      paddingX: 28,
-      paddingY: 24,
-    },
-    notes: "Hex-lined generated map. Keep hitboxes transparent; map art owns the visible grid.",
+    showGridLines: true,
+    metrics: DEFAULT_HEX_METRICS,
+    notes: "No baked AI grid. The game renders the exact clickable hex grid over the art.",
   },
 ];
 
@@ -37,6 +34,7 @@ export function getBattleMapLayout(scenarioId: string, stageId: string): BattleM
       mode: "terrain-tiles",
       showTerrainFill: true,
       showHexLabels: true,
+      showGridLines: true,
       metrics: DEFAULT_HEX_METRICS,
     }
   );

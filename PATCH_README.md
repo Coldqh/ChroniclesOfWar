@@ -1,7 +1,9 @@
-# PATCH MODE — Map Layout System v0.1.8
+# PATCH MODE — Exact Game Grid Map v0.1.9
 
-Goal:
-Make map fitting reusable for future maps.
+Главная правка:
+- больше не используем AI-карту с запечённой гекс-сеткой;
+- карта — нижний слой без гексов;
+- гексы рисует сама игра по тем же координатам, по которым работают клики, юниты, движение и атака.
 
 Changed files:
 - package.json
@@ -9,20 +11,9 @@ Changed files:
 - src/core/map/map-layout-types.ts
 - src/data/maps/battle-map-layouts.ts
 - src/data/maps/MAP_LAYOUT_GUIDE.md
-- src/data/battles/crecy-1346/crecy-1346.map.ts
 - src/features/battle/HexMap.tsx
 - src/app/ThemeModes.css
 - src/assets/maps/crecy-1346-stage-advance.png
-
-What changed:
-- Added map layout registry.
-- HexMap no longer hardcodes all visual hex metrics.
-- Each battle can define its own map metrics and background class.
-- Crécy map no longer disappears after stage change.
-- When using an image-underlay map, visible terrain fills and old grid lines are hidden.
-- Movement / attack / selection overlays stay above the map.
-- Crécy terrain data is synced to the intended 12x9 terrain matrix.
-- Bottom nav follows light/dark theme.
 
 Verify:
 ```powershell
@@ -35,6 +26,6 @@ Commit:
 ```powershell
 cd C:\ChroniclesOfWar
 git add -A
-git commit -m "Add reusable map layout system v0.1.8"
+git commit -m "Use exact game grid map v0.1.9"
 git push origin main
 ```

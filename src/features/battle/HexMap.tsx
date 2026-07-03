@@ -122,7 +122,7 @@ export function HexMap({
       </div>
 
       <div
-        className={`hex-map battle-${toClassToken(scenario.id)} stage-${toClassToken(activeStage.id)} layout-${toClassToken(layout.id)} ${hasImageUnderlay ? "has-stage-map" : ""} ${layout.showTerrainFill ? "show-terrain-fill" : "hide-terrain-fill"} ${layout.showHexLabels ? "show-hex-labels" : "hide-hex-labels"}`}
+        className={`hex-map battle-${toClassToken(scenario.id)} stage-${toClassToken(activeStage.id)} layout-${toClassToken(layout.id)} ${hasImageUnderlay ? "has-stage-map" : ""} ${layout.showTerrainFill ? "show-terrain-fill" : "hide-terrain-fill"} ${layout.showHexLabels ? "show-hex-labels" : "hide-hex-labels"} ${layout.showGridLines ? "show-grid-lines" : "hide-grid-lines"}`}
         style={{ width, height }}
       >
         {hasImageUnderlay ? (

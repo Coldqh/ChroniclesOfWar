@@ -17,6 +17,7 @@ export type BattleMapLayout = {
   backgroundClassName?: string;
   showTerrainFill: boolean;
   showHexLabels: boolean;
+  showGridLines: boolean;
   metrics: HexVisualMetrics;
   notes?: string;
 };
