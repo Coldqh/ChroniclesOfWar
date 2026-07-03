@@ -1,0 +1,120 @@
+:root {
+  color: #eee2c7;
+  background: #050506;
+}
+
+body {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    radial-gradient(circle at top, rgba(90, 69, 37, 0.18), transparent 34%),
+    linear-gradient(135deg, #09090a 0%, #050506 52%, #000 100%);
+  background-size: 28px 28px, 28px 28px, auto, auto;
+}
+
+.menu-topbar,
+.campaign-panel,
+.current-battle-panel,
+.mode-panel,
+.result-panel,
+.intro-panel,
+.card-panel,
+.battle-card,
+.side-card,
+.battle-side-panel,
+.map-frame {
+  border-color: rgba(206, 164, 84, 0.34);
+  background: rgba(7, 7, 8, 0.94);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.58);
+}
+
+.menu-topbar,
+.battle-hud,
+.stage-summary {
+  background: linear-gradient(180deg, rgba(20, 20, 22, 0.98), rgba(4, 4, 5, 0.98));
+}
+
+.campaign-panel,
+.current-battle-panel,
+.mode-panel,
+.battle-side-panel,
+.card-panel {
+  background:
+    linear-gradient(180deg, rgba(18, 18, 20, 0.96), rgba(5, 5, 6, 0.96));
+}
+
+.map-frame {
+  background:
+    linear-gradient(180deg, rgba(29, 25, 18, 0.22), rgba(0, 0, 0, 0.9)),
+    #060606;
+}
+
+.mode-button {
+  background: linear-gradient(180deg, rgba(21, 21, 23, 0.96), rgba(6, 6, 7, 0.96));
+}
+
+.primary-button {
+  color: #070707;
+  background: linear-gradient(180deg, #e5bd67, #9b672e);
+}
+
+.ghost-button {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.battle-facts span,
+.hud-stats span,
+.campaign-year,
+.battle-stamp,
+.unit-stats-grid span,
+.tile-info-grid,
+.battle-message {
+  background: rgba(0, 0, 0, 0.32);
+}
+
+.version-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(206, 164, 84, 0.38);
+  padding: 4px 7px;
+  color: #e5bd67;
+  background: rgba(0, 0, 0, 0.35);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.terrain-effects-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.terrain-effect-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid rgba(206, 164, 84, 0.16);
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.22);
+  font-size: 12px;
+}
+
+.terrain-effect-row span {
+  color: rgba(238, 226, 199, 0.66);
+}
+
+.terrain-effect-row strong.positive {
+  color: #bce9c3;
+}
+
+.terrain-effect-row strong.negative {
+  color: #ffb0a7;
+}
+
+.terrain-plain { background: linear-gradient(145deg, #3c3629, #242018); }
+.terrain-hill { background: linear-gradient(145deg, #5a432a, #292016); }
+.terrain-mud { background: linear-gradient(145deg, #30251f, #151211); }
+.terrain-forest { background: linear-gradient(145deg, #203324, #101811); }
+.terrain-road { background: linear-gradient(145deg, #4a3a25, #211a12); }

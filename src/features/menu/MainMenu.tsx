@@ -1,3 +1,5 @@
+import { APP_BUILD_LABEL, APP_VERSION } from "../../app/version";
+
 type MainMenuProps = {
   onStart: () => void;
 };
@@ -15,9 +17,9 @@ export function MainMenu({ onStart }: MainMenuProps) {
       <header className="menu-topbar">
         <div>
           <strong>Хроники войны</strong>
-          <span>v0.1</span>
+          <span className="version-chip">{APP_VERSION}</span>
         </div>
-        <span className="menu-build-tag">Историческая тактика</span>
+        <span className="menu-build-tag">{APP_BUILD_LABEL}</span>
       </header>
 
       <section className="war-room">
@@ -42,14 +44,14 @@ export function MainMenu({ onStart }: MainMenuProps) {
           <h2>Креси, 1346</h2>
           <p>
             Английская армия занимает высоту. Французская конница идёт в атаку.
-            Первое демо проверяет гексы, движение, атаку, мораль и выбор стороны.
+            Теперь местность влияет на защиту, движение и эффективность войск.
           </p>
 
           <div className="battle-facts">
             <span>Пошаговый бой</span>
             <span>2 стороны</span>
             <span>Гексы</span>
-            <span>Мораль</span>
+            <span>Местность</span>
           </div>
 
           <button className="primary-button menu-play-button" onClick={onStart}>

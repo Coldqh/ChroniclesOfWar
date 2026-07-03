@@ -1,6 +1,7 @@
 import type { BattleScenario, BattleState, Unit } from "../battle/battle-types";
 import type { CombatPreview } from "./combat-types";
 import { hexDistance } from "../hex/hex-utils";
+import { clampTerrainDefense, getTerrainAtCoord, getTerrainAttackMultiplier } from "./terrain-combat";
 
 function getNearbyCommanderBonus(state: BattleState, unit: Unit): number {
   const commanders = Object.values(state.units).filter(
@@ -10,13 +11,9 @@ function getNearbyCommanderBonus(state: BattleState, unit: Unit): number {
   return commanders.some((candidate) => hexDistance(candidate.position, unit.position) <= (candidate.commander?.range ?? 0)) ? 1.1 : 1;
 }
 
-function clampTerrainDefense(value: number): number {
-  return Math.max(-0.5, Math.min(0.75, value));
-}
-
 export function getCombatPreview(scenario: BattleScenario, state: BattleState, attacker: Unit, target: Unit): CombatPreview {
   if (attacker.sideId === target.sideId) {
-    return blocked(attacker.id, target.id, attacker.currentHp, target.currentCount, "Нельзя атаковать союзника.");
+    return blocked(attacker.id, target.id, target.currentHp, target.currentCount, "Нельзя атаковать союзника.");
   }
 
   if (attacker.hasAttacked) {
@@ -36,14 +33,14 @@ export function getCombatPreview(scenario: BattleScenario, state: BattleState, a
     return blocked(attacker.id, target.id, target.currentHp, target.currentCount, "Цель вне дальности.");
   }
 
-  const terrainTile = scenario.map.tiles.find((tile) => tile.coord.q === target.position.q && tile.coord.r === target.position.r);
-  const terrain = scenario.terrain.find((item) => item.id === terrainTile?.terrainId);
-  const terrainDefense = clampTerrainDefense(terrain?.defenseBonus ?? 0);
+  const targetTerrain = getTerrainAtCoord(scenario, target.position);
+  const terrainDefense = clampTerrainDefense(targetTerrain?.defenseBonus ?? 0);
+  const roleAttackMultiplier = getTerrainAttackMultiplier(targetTerrain, attacker.type.role);
 
   const strengthRatio = Math.max(0.25, attacker.currentCount / attacker.type.maxCount);
   const moraleRatio = Math.max(0.45, attacker.morale / attacker.type.morale);
   const commanderBonus = getNearbyCommanderBonus(state, attacker);
-  const baseDamage = attacker.type.attack * strengthRatio * moraleRatio * commanderBonus;
+  const baseDamage = attacker.type.attack * strengthRatio * moraleRatio * commanderBonus * roleAttackMultiplier;
   const mitigatedDamage = Math.max(1, Math.round(baseDamage * (1 - terrainDefense)));
   const expectedKills = Math.min(target.currentCount, Math.floor(mitigatedDamage / target.type.hpPerSoldier));
   const moraleDamage = Math.max(4, Math.round(expectedKills * 0.8 + attacker.type.attack * 0.12));

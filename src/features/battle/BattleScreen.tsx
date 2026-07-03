@@ -2,9 +2,10 @@ import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { applyBattleCommand, runBasicAiTurn } from "../../core/battle/battle-engine";
 import type { BattleCommand } from "../../core/battle/battle-commands";
-import type { BattleScenario, BattleState } from "../../core/battle/battle-types";
+import type { BattleScenario, BattleState, UnitRole } from "../../core/battle/battle-types";
 import type { HexCoord } from "../../core/hex/hex-types";
 import { getCombatPreview } from "../../core/combat/combat-preview";
+import { formatSignedPercent } from "../../core/combat/terrain-combat";
 import { getMovementRange } from "../../core/movement/movement-rules";
 import { BattleHud } from "./BattleHud";
 import { CombatPreviewPanel } from "./CombatPreviewPanel";
@@ -18,6 +19,15 @@ type BattleScreenProps = {
   setState: Dispatch<SetStateAction<BattleState | null>>;
   onExit: () => void;
   onRestart: () => void;
+};
+
+const roleLabels: Record<UnitRole, string> = {
+  infantry: "Пехота",
+  archer: "Лучники",
+  crossbow: "Арбалеты",
+  cavalry: "Конница",
+  guard: "Гвардия",
+  commander: "Командиры",
 };
 
 export function BattleScreen({ scenario, state, setState, onExit, onRestart }: BattleScreenProps) {
@@ -42,6 +52,9 @@ export function BattleScreen({ scenario, state, setState, onExit, onRestart }: B
   const inspectedTerrain = inspectedTile
     ? scenario.terrain.find((terrain) => terrain.id === inspectedTile.terrainId)
     : null;
+  const terrainEffects = inspectedTerrain?.roleAttackModifiers
+    ? Object.entries(inspectedTerrain.roleAttackModifiers) as Array<[UnitRole, number]>
+    : [];
 
   useEffect(() => {
     if (state.phase !== "finished" && state.activeSideId !== state.playerSideId) {
@@ -127,8 +140,21 @@ export function BattleScreen({ scenario, state, setState, onExit, onRestart }: B
                   <span>Ход</span>
                   <strong>{inspectedTerrain.moveCost}</strong>
                   <span>Защита</span>
-                  <strong>{inspectedTerrain.defenseBonus >= 0 ? "+" : ""}{inspectedTerrain.defenseBonus}</strong>
+                  <strong>{formatSignedPercent(inspectedTerrain.defenseBonus)}</strong>
                 </div>
+
+                {terrainEffects.length > 0 && (
+                  <div className="terrain-effects-list">
+                    {terrainEffects.map(([role, modifier]) => (
+                      <div className="terrain-effect-row" key={role}>
+                        <span>{roleLabels[role]}</span>
+                        <strong className={modifier >= 0 ? "positive" : "negative"}>
+                          {formatSignedPercent(modifier)}
+                        </strong>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </>
             ) : (
               <p>Наведи или нажми на гекс.</p>

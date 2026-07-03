@@ -10,15 +10,16 @@ export type BattleSide = {
   objective: string;
 };
 
+export type UnitRole = "infantry" | "archer" | "crossbow" | "cavalry" | "guard" | "commander";
+
 export type TerrainData = {
   id: TerrainId;
   name: string;
   moveCost: number;
   defenseBonus: number;
   blocksMovement?: boolean;
+  roleAttackModifiers?: Partial<Record<UnitRole, number>>;
 };
-
-export type UnitRole = "infantry" | "archer" | "crossbow" | "cavalry" | "guard" | "commander";
 
 export type UnitType = {
   id: UnitTypeId;

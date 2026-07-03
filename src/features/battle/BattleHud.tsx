@@ -1,3 +1,4 @@
+import { APP_VERSION } from "../../app/version";
 import type { BattleScenario, BattleStage, BattleState } from "../../core/battle/battle-types";
 
 type BattleHudProps = {
@@ -23,6 +24,7 @@ export function BattleHud({ scenario, state, activeStage, onExit }: BattleHudPro
       </div>
 
       <div className="hud-stats">
+        <span>{APP_VERSION}</span>
         <span>Ход {state.turn}</span>
         <span>Активно: {activeSide?.name}</span>
         <span>Вы: {playerSide?.name}</span>
