@@ -1,7 +1,7 @@
-import crecyStageMap from "../../assets/maps/crecy-1346-stage-advance.png";
 import type { BattleScenario, BattleStage, BattleState, Unit } from "../../core/battle/battle-types";
 import type { HexCoord } from "../../core/hex/hex-types";
 import { hexKey, sameHex } from "../../core/hex/hex-utils";
+import { getBattleMapLayout } from "../../data/maps/battle-map-layouts";
 
 type HexMapProps = {
   scenario: BattleScenario;
@@ -15,13 +15,6 @@ type HexMapProps = {
   onBattleMessage: (message: string) => void;
   onInspectTile: (coord: HexCoord) => void;
 };
-
-const HEX_W = 72;
-const HEX_H = 82;
-const HEX_X_STEP = HEX_W;
-const HEX_Y_STEP = HEX_H * 0.75;
-const MAP_PADDING_X = 28;
-const MAP_PADDING_Y = 24;
 
 function isActiveUnit(unit: Unit | undefined): unit is Unit {
   return Boolean(unit && unit.status !== "destroyed" && unit.status !== "routed");
@@ -49,7 +42,9 @@ export function HexMap({
   const unitsByHex = new Map(Object.values(state.units).map((unit) => [hexKey(unit.position), unit]));
   const terrainById = new Map(scenario.terrain.map((terrain) => [terrain.id, terrain]));
   const isPlayerTurn = state.activeSideId === state.playerSideId;
-  const backgroundMap = scenario.id === "crecy-1346" ? crecyStageMap : null;
+  const layout = getBattleMapLayout(scenario.id, activeStage.id);
+  const metrics = layout.metrics;
+  const hasImageUnderlay = layout.mode === "image-underlay" && Boolean(layout.backgroundClassName);
 
   function handleTileClick(coord: HexCoord) {
     onInspectTile(coord);
@@ -116,25 +111,24 @@ export function HexMap({
     onBattleMessage("Клетка недоступна.");
   }
 
-  const width = scenario.map.width * HEX_X_STEP + HEX_W + MAP_PADDING_X * 2;
-  const height = scenario.map.height * HEX_Y_STEP + HEX_H + MAP_PADDING_Y * 2;
+  const width = scenario.map.width * metrics.xStep + metrics.width + metrics.paddingX * 2;
+  const height = scenario.map.height * metrics.yStep + metrics.height + metrics.paddingY * 2;
 
   return (
-    <section className={`map-frame ${backgroundMap ? "has-stage-map-frame" : ""}`}>
+    <section className={`map-frame ${hasImageUnderlay ? "has-stage-map-frame" : ""}`}>
       <div className="stage-summary">
         <strong>{activeStage.title}</strong>
         <span>{activeStage.summary}</span>
       </div>
 
       <div
-        className={`hex-map battle-${toClassToken(scenario.id)} stage-${toClassToken(activeStage.id)} ${backgroundMap ? "has-stage-map" : ""}`}
+        className={`hex-map battle-${toClassToken(scenario.id)} stage-${toClassToken(activeStage.id)} layout-${toClassToken(layout.id)} ${hasImageUnderlay ? "has-stage-map" : ""} ${layout.showTerrainFill ? "show-terrain-fill" : "hide-terrain-fill"} ${layout.showHexLabels ? "show-hex-labels" : "hide-hex-labels"}`}
         style={{ width, height }}
       >
-        {backgroundMap ? (
+        {hasImageUnderlay ? (
           <div
-            className="hex-map-background-layer"
+            className={`hex-map-background-layer ${layout.backgroundClassName}`}
             aria-hidden="true"
-            style={{ backgroundImage: `url(${backgroundMap})` }}
           />
         ) : null}
 
@@ -142,8 +136,8 @@ export function HexMap({
           const key = hexKey(tile.coord);
           const unit = unitsByHex.get(key);
           const terrain = terrainById.get(tile.terrainId);
-          const x = tile.coord.q * HEX_X_STEP + (tile.coord.r % 2) * (HEX_W / 2) + MAP_PADDING_X;
-          const y = tile.coord.r * HEX_Y_STEP + MAP_PADDING_Y;
+          const x = tile.coord.q * metrics.xStep + (tile.coord.r % 2) * (metrics.width / 2) + metrics.paddingX;
+          const y = tile.coord.r * metrics.yStep + metrics.paddingY;
           const activeUnit = isActiveUnit(unit) ? unit : null;
           const isSelected = selectedUnit && sameHex(selectedUnit.position, tile.coord);
           const canMove = movementKeys.has(key);
@@ -162,7 +156,11 @@ export function HexMap({
             <button
               key={key}
               className={`hex-tile terrain-${tile.terrainId} ${isSelected ? "selected" : ""} ${canMove ? "can-move" : ""} ${canTarget ? "can-target" : ""} ${isOccupied ? "occupied" : ""} ${isFriendly ? "friendly" : ""} ${isEnemy ? "enemy" : ""} ${isSpent ? "spent" : ""} ${!inStage ? "out-stage" : ""}`}
-              style={{ transform: `translate(${x}px, ${y}px)` }}
+              style={{
+                width: metrics.width,
+                height: metrics.height,
+                transform: `translate(${x}px, ${y}px)`,
+              }}
               onClick={() => handleTileClick(tile.coord)}
               onMouseEnter={() => onInspectTile(tile.coord)}
               onFocus={() => onInspectTile(tile.coord)}
