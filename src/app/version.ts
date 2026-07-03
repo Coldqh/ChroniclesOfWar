@@ -1,2 +1,2 @@
-export const APP_VERSION = "v0.1.9";
-export const APP_BUILD_LABEL = "Exact Game Grid";
+export const APP_VERSION = "v0.1.10";
+export const APP_BUILD_LABEL = "New Crecy Map";

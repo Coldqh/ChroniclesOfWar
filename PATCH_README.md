@@ -1,19 +1,15 @@
-# PATCH MODE — Exact Game Grid Map v0.1.9
-
-Главная правка:
-- больше не используем AI-карту с запечённой гекс-сеткой;
-- карта — нижний слой без гексов;
-- гексы рисует сама игра по тем же координатам, по которым работают клики, юниты, движение и атака.
+# PATCH MODE — Insert New Crécy Map v0.1.10
 
 Changed files:
 - package.json
 - src/app/version.ts
-- src/core/map/map-layout-types.ts
-- src/data/maps/battle-map-layouts.ts
-- src/data/maps/MAP_LAYOUT_GUIDE.md
-- src/features/battle/HexMap.tsx
-- src/app/ThemeModes.css
 - src/assets/maps/crecy-1346-stage-advance.png
+
+What changed:
+- Replaced Crécy stage map underlay with the newly provided map.
+- Resized/cropped map to exact game container size: 992x684.
+- Kept the map without baked hex grid.
+- The game should still render the clickable hex grid on top if v0.1.9 map layout system is applied.
 
 Verify:
 ```powershell
@@ -26,6 +22,6 @@ Commit:
 ```powershell
 cd C:\ChroniclesOfWar
 git add -A
-git commit -m "Use exact game grid map v0.1.9"
+git commit -m "Insert new Crecy map v0.1.10"
 git push origin main
 ```
