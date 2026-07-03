@@ -10,18 +10,25 @@ type BattleHudProps = {
 export function BattleHud({ scenario, state, activeStage, onExit }: BattleHudProps) {
   const activeSide = scenario.sides.find((side) => side.id === state.activeSideId);
   const playerSide = scenario.sides.find((side) => side.id === state.playerSideId);
+  const isPlayerTurn = state.activeSideId === state.playerSideId;
 
   return (
     <header className="battle-hud">
       <button className="ghost-button" onClick={onExit}>Меню</button>
-      <div>
+
+      <div className="battle-hud-main">
         <span className="eyebrow">{scenario.title}</span>
         <h2>{activeStage.title}</h2>
+        <p>{activeStage.summary}</p>
       </div>
+
       <div className="hud-stats">
         <span>Ход {state.turn}</span>
         <span>Активно: {activeSide?.name}</span>
         <span>Вы: {playerSide?.name}</span>
+        <span className={`turn-badge ${isPlayerTurn ? "player" : "ai"}`}>
+          {isPlayerTurn ? "Игрок" : "AI"}
+        </span>
       </div>
     </header>
   );

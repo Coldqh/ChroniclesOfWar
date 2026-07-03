@@ -14,16 +14,20 @@ export function CombatPreviewPanel({ selectedUnit, targets, scenario, state }: C
   return (
     <section className="card-panel">
       <h3>Прогноз атаки</h3>
+      {selectedUnit.hasAttacked && <p>Этот отряд уже атаковал в текущем ходу.</p>}
       {targets.length === 0 && <p>Целей в дальности нет.</p>}
+
       {targets.map((target) => {
         const preview = getCombatPreview(scenario, state, selectedUnit, target);
         const maxHp = target.type.maxCount * target.type.hpPerSoldier;
-        const afterPercent = Math.round((preview.targetHpAfter / maxHp) * 100);
+        const afterPercent = Math.max(0, Math.min(100, Math.round((preview.targetHpAfter / maxHp) * 100)));
+        const losses = Math.max(0, target.currentCount - preview.targetCountAfter);
+
         return (
           <div key={target.id} className="preview-row">
             <span>{target.type.icon} {target.type.name}</span>
             <div className="bar danger"><span style={{ width: `${afterPercent}%` }} /></div>
-            <small>мораль -{preview.moraleDamage}</small>
+            <small>потери: {losses} · мораль -{preview.moraleDamage}</small>
           </div>
         );
       })}
