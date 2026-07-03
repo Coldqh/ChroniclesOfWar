@@ -1,5 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useMemo, useState } from "react";
+import type { ThemeMode } from "../../app/App";
 import { applyBattleCommand, runBasicAiTurn } from "../../core/battle/battle-engine";
 import type { BattleCommand } from "../../core/battle/battle-commands";
 import type { BattleScenario, BattleState, UnitRole } from "../../core/battle/battle-types";
@@ -19,6 +20,8 @@ type BattleScreenProps = {
   scenario: BattleScenario;
   state: BattleState;
   setState: Dispatch<SetStateAction<BattleState | null>>;
+  theme: ThemeMode;
+  onToggleTheme: () => void;
   onExit: () => void;
   onRestart: () => void;
 };
@@ -32,7 +35,7 @@ const roleLabels: Record<UnitRole, string> = {
   commander: "Командиры",
 };
 
-export function BattleScreen({ scenario, state, setState, onExit, onRestart }: BattleScreenProps) {
+export function BattleScreen({ scenario, state, setState, theme, onToggleTheme, onExit, onRestart }: BattleScreenProps) {
   const selectedUnit = state.selectedUnitId ? state.units[state.selectedUnitId] : null;
   const activeStage = scenario.stages.find((stage) => stage.id === state.currentStageId) ?? scenario.stages[0];
   const movementRange = selectedUnit ? getMovementRange(scenario, state, selectedUnit) : [];
@@ -100,7 +103,14 @@ export function BattleScreen({ scenario, state, setState, onExit, onRestart }: B
 
   return (
     <main className="battle-shell">
-      <BattleHud scenario={scenario} state={state} activeStage={activeStage} onExit={onExit} />
+      <BattleHud
+        scenario={scenario}
+        state={state}
+        activeStage={activeStage}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
+        onExit={onExit}
+      />
 
       <section className="battle-layout">
         <aside className="battle-side-panel left-panel">

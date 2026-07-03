@@ -26,6 +26,10 @@ function isActiveUnit(unit: Unit | undefined): unit is Unit {
   return Boolean(unit && unit.status !== "destroyed" && unit.status !== "routed");
 }
 
+function toClassToken(value: string) {
+  return value.replace(/[^a-zA-Z0-9_-]/g, "-");
+}
+
 export function HexMap({
   scenario,
   state,
@@ -44,6 +48,7 @@ export function HexMap({
   const unitsByHex = new Map(Object.values(state.units).map((unit) => [hexKey(unit.position), unit]));
   const terrainById = new Map(scenario.terrain.map((terrain) => [terrain.id, terrain]));
   const isPlayerTurn = state.activeSideId === state.playerSideId;
+  const hasStageMap = scenario.id === "crecy-1346" && activeStage.id === "advance";
 
   function handleTileClick(coord: HexCoord) {
     onInspectTile(coord);
@@ -114,13 +119,16 @@ export function HexMap({
   const height = scenario.map.height * HEX_Y_STEP + HEX_H + MAP_PADDING_Y * 2;
 
   return (
-    <section className="map-frame">
+    <section className={`map-frame ${hasStageMap ? "has-stage-map-frame" : ""}`}>
       <div className="stage-summary">
         <strong>{activeStage.title}</strong>
         <span>{activeStage.summary}</span>
       </div>
 
-      <div className="hex-map" style={{ width, height }}>
+      <div
+        className={`hex-map battle-${toClassToken(scenario.id)} stage-${toClassToken(activeStage.id)} ${hasStageMap ? "has-stage-map" : ""}`}
+        style={{ width, height }}
+      >
         {scenario.map.tiles.map((tile) => {
           const key = hexKey(tile.coord);
           const unit = unitsByHex.get(key);

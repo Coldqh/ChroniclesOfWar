@@ -1,7 +1,10 @@
+import type { ThemeMode } from "../../app/App";
 import { APP_BUILD_LABEL, APP_VERSION } from "../../app/version";
 
 type MainMenuProps = {
   onStart: () => void;
+  theme: ThemeMode;
+  onToggleTheme: () => void;
 };
 
 const lockedSections = [
@@ -17,7 +20,7 @@ const missionCards = [
   { title: "Французский натиск", icon: "✚", status: "Сценарий" },
 ];
 
-export function MainMenu({ onStart }: MainMenuProps) {
+export function MainMenu({ onStart, theme, onToggleTheme }: MainMenuProps) {
   return (
     <main className="screen menu-screen strategy-menu manuscript-screen">
       <header className="menu-topbar manuscript-topbar">
@@ -31,7 +34,12 @@ export function MainMenu({ onStart }: MainMenuProps) {
           <span className="emblem-cross" />
         </div>
 
-        <span className="menu-build-tag">{APP_BUILD_LABEL}</span>
+        <div className="topbar-actions">
+          <span className="menu-build-tag">{APP_BUILD_LABEL}</span>
+          <button className="theme-toggle-button" onClick={onToggleTheme}>
+            {theme === "dark" ? "Обычный режим" : "Dark mode"}
+          </button>
+        </div>
       </header>
 
       <section className="war-room manuscript-war-room">

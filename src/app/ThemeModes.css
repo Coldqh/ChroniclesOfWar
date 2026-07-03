@@ -1,0 +1,227 @@
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.theme-toggle-button {
+  border: 1px solid rgba(115, 67, 26, 0.42);
+  padding: 7px 10px;
+  color: #3a1a0e;
+  background:
+    linear-gradient(180deg, rgba(255, 246, 213, 0.76), rgba(185, 132, 67, 0.28));
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.theme-toggle-button.compact {
+  padding: 6px 8px;
+  color: inherit;
+}
+
+/* Crécy stage 1 map background, pre-fitted for current 12x9 hex layout. */
+.hex-map.has-stage-map {
+  isolation: isolate;
+  overflow: hidden;
+  background-image:
+    linear-gradient(rgba(38, 22, 10, 0.03), rgba(38, 22, 10, 0.03)),
+    url("../assets/maps/crecy-1346-stage-advance.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  border: 2px solid rgba(78, 44, 18, 0.42);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 239, 190, 0.24),
+    inset 0 0 32px rgba(45, 25, 10, 0.18);
+}
+
+.hex-map.has-stage-map .hex-tile {
+  background: rgba(255, 239, 190, 0.035);
+  box-shadow:
+    inset 0 0 0 1px rgba(42, 24, 10, 0.25),
+    inset 0 0 10px rgba(255, 239, 190, 0.06);
+  backdrop-filter: none;
+}
+
+.hex-map.has-stage-map .hex-tile:hover {
+  background: rgba(255, 239, 190, 0.12);
+}
+
+.hex-map.has-stage-map .hex-label {
+  color: rgba(42, 24, 10, 0.72);
+  font-weight: 900;
+  text-shadow: 0 1px 0 rgba(255, 239, 190, 0.5);
+}
+
+.hex-map.has-stage-map .hex-tile.out-stage {
+  opacity: 0.42;
+  background: rgba(43, 24, 10, 0.14);
+}
+
+.hex-map.has-stage-map .hex-tile.can-move {
+  background: rgba(84, 133, 195, 0.18);
+  box-shadow:
+    inset 0 0 0 2px rgba(69, 124, 196, 0.85),
+    0 0 14px rgba(69, 124, 196, 0.32);
+}
+
+.hex-map.has-stage-map .hex-tile.can-target {
+  background: rgba(178, 54, 38, 0.18);
+  box-shadow:
+    inset 0 0 0 2px rgba(163, 44, 31, 0.9),
+    0 0 14px rgba(163, 44, 31, 0.35);
+}
+
+.hex-map.has-stage-map .hex-tile.selected {
+  background: rgba(230, 188, 91, 0.24);
+  outline: none;
+  box-shadow:
+    inset 0 0 0 3px rgba(229, 183, 83, 0.95),
+    0 0 18px rgba(229, 183, 83, 0.5);
+}
+
+/* Dark mode */
+[data-theme="dark"] {
+  color: #eee2c7;
+  background: #050506;
+}
+
+[data-theme="dark"] body {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    radial-gradient(circle at top, rgba(90, 69, 37, 0.18), transparent 34%),
+    linear-gradient(135deg, #09090a 0%, #050506 52%, #000 100%);
+  background-size: 28px 28px, 28px 28px, auto, auto;
+}
+
+[data-theme="dark"] .screen,
+[data-theme="dark"] .menu-topbar strong,
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3 {
+  color: #efe3c5;
+}
+
+[data-theme="dark"] p,
+[data-theme="dark"] .stage-summary span,
+[data-theme="dark"] .mode-button span,
+[data-theme="dark"] .battle-meta,
+[data-theme="dark"] .small-note {
+  color: rgba(239, 227, 197, 0.7);
+}
+
+[data-theme="dark"] .menu-topbar,
+[data-theme="dark"] .campaign-panel,
+[data-theme="dark"] .current-battle-panel,
+[data-theme="dark"] .mode-panel,
+[data-theme="dark"] .result-panel,
+[data-theme="dark"] .intro-panel,
+[data-theme="dark"] .card-panel,
+[data-theme="dark"] .battle-card,
+[data-theme="dark"] .side-card,
+[data-theme="dark"] .battle-side-panel,
+[data-theme="dark"] .map-frame,
+[data-theme="dark"] .manuscript-panel {
+  border-color: rgba(206, 164, 84, 0.34);
+  background:
+    linear-gradient(180deg, rgba(18, 18, 20, 0.96), rgba(5, 5, 6, 0.96));
+  color: #eee2c7;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.58);
+}
+
+[data-theme="dark"] .menu-topbar,
+[data-theme="dark"] .battle-hud,
+[data-theme="dark"] .stage-summary {
+  background: linear-gradient(180deg, rgba(20, 20, 22, 0.98), rgba(4, 4, 5, 0.98));
+  color: #eee2c7;
+}
+
+[data-theme="dark"] .eyebrow,
+[data-theme="dark"] .battle-stamp,
+[data-theme="dark"] .menu-build-tag {
+  color: #e5bd67;
+}
+
+[data-theme="dark"] .menu-build-tag,
+[data-theme="dark"] .version-chip,
+[data-theme="dark"] .battle-stamp,
+[data-theme="dark"] .campaign-year,
+[data-theme="dark"] .battle-facts span,
+[data-theme="dark"] .hud-stats span,
+[data-theme="dark"] .theme-toggle-button {
+  border-color: rgba(206, 164, 84, 0.38);
+  background: rgba(0, 0, 0, 0.35);
+  color: #e5bd67;
+}
+
+[data-theme="dark"] .ghost-button,
+[data-theme="dark"] .mode-button {
+  color: #eee2c7;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+[data-theme="dark"] .primary-button {
+  color: #070707;
+  background: linear-gradient(180deg, #e5bd67, #9b672e);
+}
+
+[data-theme="dark"] .map-frame {
+  background:
+    linear-gradient(180deg, rgba(29, 25, 18, 0.22), rgba(0, 0, 0, 0.9)),
+    #060606;
+}
+
+[data-theme="dark"] .hex-map.has-stage-map {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.22)),
+    url("../assets/maps/crecy-1346-stage-advance.png");
+  border-color: rgba(206, 164, 84, 0.28);
+}
+
+[data-theme="dark"] .hex-map.has-stage-map .hex-tile {
+  background: rgba(0, 0, 0, 0.09);
+  box-shadow:
+    inset 0 0 0 1px rgba(239, 227, 197, 0.18),
+    inset 0 0 10px rgba(0, 0, 0, 0.16);
+}
+
+[data-theme="dark"] .hex-map.has-stage-map .hex-label {
+  color: rgba(239, 227, 197, 0.72);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.72);
+}
+
+[data-theme="dark"] .log-entry,
+[data-theme="dark"] .chronicle p,
+[data-theme="dark"] .unit-stats-grid span,
+[data-theme="dark"] .battle-message,
+[data-theme="dark"] .tile-info-grid,
+[data-theme="dark"] .terrain-effect-row,
+[data-theme="dark"] .objective-row,
+[data-theme="dark"] .stage-objective,
+[data-theme="dark"] .result-outcome {
+  border-color: rgba(206, 164, 84, 0.22);
+  background: rgba(0, 0, 0, 0.32);
+  color: #eee2c7;
+}
+
+[data-theme="dark"] .stage-objective strong,
+[data-theme="dark"] .objective-row strong {
+  color: #f0d28c;
+}
+
+[data-theme="dark"] .objective-row span,
+[data-theme="dark"] .stage-objective span {
+  color: rgba(239, 227, 197, 0.68);
+}
+
+@media (max-width: 980px) {
+  .topbar-actions {
+    justify-content: center;
+  }
+}

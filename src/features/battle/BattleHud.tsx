@@ -1,3 +1,4 @@
+import type { ThemeMode } from "../../app/App";
 import { APP_VERSION } from "../../app/version";
 import type { BattleScenario, BattleStage, BattleState } from "../../core/battle/battle-types";
 
@@ -5,10 +6,12 @@ type BattleHudProps = {
   scenario: BattleScenario;
   state: BattleState;
   activeStage: BattleStage;
+  theme: ThemeMode;
+  onToggleTheme: () => void;
   onExit: () => void;
 };
 
-export function BattleHud({ scenario, state, activeStage, onExit }: BattleHudProps) {
+export function BattleHud({ scenario, state, activeStage, theme, onToggleTheme, onExit }: BattleHudProps) {
   const activeSide = scenario.sides.find((side) => side.id === state.activeSideId);
   const playerSide = scenario.sides.find((side) => side.id === state.playerSideId);
   const isPlayerTurn = state.activeSideId === state.playerSideId;
@@ -32,6 +35,9 @@ export function BattleHud({ scenario, state, activeStage, onExit }: BattleHudPro
         <span className={`turn-badge ${isPlayerTurn ? "player" : "ai"}`}>
           {isPlayerTurn ? "Игрок" : "AI"}
         </span>
+        <button className="theme-toggle-button compact" onClick={onToggleTheme}>
+          {theme === "dark" ? "Свет" : "Dark"}
+        </button>
       </div>
     </header>
   );

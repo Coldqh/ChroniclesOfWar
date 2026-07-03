@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { App } from "./app/App";
 import "./app/App.css";
 import "./app/ManuscriptTheme.css";
+import "./app/ThemeModes.css";
 
 function renderBootError(error: unknown) {
   const rootElement = document.getElementById("root");
