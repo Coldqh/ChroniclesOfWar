@@ -1,0 +1,99 @@
+.stage-objective-line {
+  margin: 4px 0 0;
+  color: rgba(94, 31, 18, 0.78);
+  font-weight: 800;
+}
+
+.objectives-panel h3 {
+  margin-bottom: 10px;
+}
+
+.stage-objective {
+  display: grid;
+  gap: 4px;
+  border: 1px solid rgba(115, 67, 26, 0.22);
+  padding: 9px;
+  background: rgba(255, 244, 211, 0.34);
+  margin-bottom: 10px;
+}
+
+.stage-objective span {
+  color: #7c1f17;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stage-objective strong {
+  color: #3a1a0e;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.objective-list {
+  display: grid;
+  gap: 7px;
+}
+
+.objective-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  border-left: 4px solid rgba(115, 67, 26, 0.35);
+  padding: 8px;
+  background: rgba(255, 244, 211, 0.28);
+}
+
+.objective-row strong,
+.objective-row span,
+.objective-row em {
+  display: block;
+}
+
+.objective-row strong {
+  color: #3a1a0e;
+  font-size: 13px;
+}
+
+.objective-row span {
+  color: rgba(43, 23, 13, 0.68);
+  font-size: 12px;
+}
+
+.objective-row em {
+  border: 1px solid rgba(115, 67, 26, 0.22);
+  padding: 4px 6px;
+  background: rgba(255, 247, 218, 0.42);
+  color: rgba(43, 23, 13, 0.72);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.objective-completed {
+  border-left-color: #40702f;
+}
+
+.objective-completed em {
+  color: #245018;
+}
+
+.objective-failed {
+  border-left-color: #8d2118;
+}
+
+.objective-failed em {
+  color: #8d2118;
+}
+
+.result-outcome {
+  margin: 10px 0 14px;
+  border: 1px solid rgba(115, 67, 26, 0.28);
+  padding: 10px 12px;
+  background: rgba(255, 244, 211, 0.38);
+  color: #5e1f12;
+  font-weight: 900;
+}

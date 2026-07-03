@@ -21,6 +21,7 @@ export function BattleHud({ scenario, state, activeStage, onExit }: BattleHudPro
         <span className="eyebrow">{scenario.title}</span>
         <h2>{activeStage.title}</h2>
         <p>{activeStage.summary}</p>
+        {activeStage.objective && <p className="stage-objective-line">Цель этапа: {activeStage.objective}</p>}
       </div>
 
       <div className="hud-stats">

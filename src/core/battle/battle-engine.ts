@@ -1,5 +1,5 @@
 import type { BattleCommand } from "./battle-commands";
-import type { BattleScenario, BattleState, Unit } from "./battle-types";
+import type { BattleScenario, BattleState, ScenarioEvent, Unit } from "./battle-types";
 import { hexDistance } from "../hex/hex-utils";
 import { canMoveTo, getMovementRange, getUnitAt } from "../movement/movement-rules";
 import { resolveCombat } from "../combat/combat-resolver";
@@ -56,7 +56,7 @@ export function applyBattleCommand(scenario: BattleScenario, state: BattleState,
         },
       };
 
-      return addLog(nextState, `${unit.type.name} меняют позицию.`, "info");
+      return finishIfNeeded(scenario, addLog(nextState, `${unit.type.name} меняют позицию.`, "info"));
     }
 
     case "ATTACK_UNIT": {
@@ -156,7 +156,7 @@ export function endTurn(scenario: BattleScenario, state: BattleState): BattleSta
     }),
   );
 
-  return addLog(
+  let nextState = addLog(
     {
       ...state,
       turn: nextTurn,
@@ -168,6 +168,17 @@ export function endTurn(scenario: BattleScenario, state: BattleState): BattleSta
     `Ход переходит к стороне: ${nextSide.name}.`,
     "history",
   );
+
+  if (currentStage !== state.currentStageId) {
+    const stage = scenario.stages.find((item) => item.id === currentStage);
+    nextState = addLog(nextState, `Новый этап: ${stage?.title ?? currentStage}. ${stage?.objective ?? stage?.summary ?? ""}`, "history");
+  }
+
+  if (wrapped) {
+    nextState = triggerScenarioEvents(scenario, nextState);
+  }
+
+  return nextState;
 }
 
 export function runBasicAiTurn(scenario: BattleScenario, state: BattleState): BattleState {
@@ -225,6 +236,25 @@ export function runBasicAiTurn(scenario: BattleScenario, state: BattleState): Ba
   return finishIfNeeded(scenario, endTurn(scenario, nextState));
 }
 
+function triggerScenarioEvents(scenario: BattleScenario, state: BattleState): BattleState {
+  let nextState = state;
+
+  for (const event of scenario.events ?? []) {
+    if (event.turn > state.turn || nextState.firedEventIds.includes(event.id)) continue;
+    nextState = markScenarioEventFired(nextState, event);
+    nextState = addLog(nextState, `${event.title}: ${event.text}`, event.tone ?? "history");
+  }
+
+  return nextState;
+}
+
+function markScenarioEventFired(state: BattleState, event: ScenarioEvent): BattleState {
+  return {
+    ...state,
+    firedEventIds: [...state.firedEventIds, event.id],
+  };
+}
+
 function finishIfNeeded(scenario: BattleScenario, state: BattleState): BattleState {
   const result = checkVictory(scenario, state);
   if (!result) return state;
@@ -253,6 +283,6 @@ function addLog(state: BattleState, text: string, tone: LogTone): BattleState {
         tone,
       },
       ...state.log,
-    ].slice(0, 12),
+    ].slice(0, 14),
   };
 }

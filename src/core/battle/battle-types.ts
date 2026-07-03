@@ -56,14 +56,54 @@ export type UnitDeployment = {
   commanderId?: CommanderId;
 };
 
+export type BattleZone = {
+  id: string;
+  name: string;
+  area?: {
+    qMin: number;
+    qMax: number;
+    rMin: number;
+    rMax: number;
+  };
+  coords?: HexCoord[];
+  label?: string;
+};
+
+export type ObjectiveCondition =
+  | { type: "hold_zone_until_turn"; zoneId: string; turn: number }
+  | { type: "occupy_zone"; zoneId: string }
+  | { type: "rout_units"; unitIds: UnitId[] }
+  | { type: "keep_units_active"; unitIds: UnitId[]; minimum: number }
+  | { type: "keep_role_active"; role: UnitRole; minimum: number };
+
+export type BattleObjective = {
+  id: string;
+  sideId: SideId;
+  title: string;
+  shortLabel: string;
+  condition: ObjectiveCondition;
+};
+
+export type ScenarioEvent = {
+  id: string;
+  turn: number;
+  title: string;
+  text: string;
+  tone?: "info" | "success" | "danger" | "history";
+};
+
 export type VictoryCondition =
   | { type: "eliminate_side"; sideId: SideId }
-  | { type: "survive_turns"; sideId: SideId; turns: number };
+  | { type: "survive_turns"; sideId: SideId; turns: number }
+  | { type: "hold_zone_until_turn"; sideId: SideId; zoneId: string; turn: number }
+  | { type: "occupy_zone"; sideId: SideId; zoneId: string }
+  | { type: "rout_units"; winnerSideId: SideId; unitIds: UnitId[] };
 
 export type BattleStage = {
   id: BattleStageId;
   title: string;
   summary: string;
+  objective?: string;
   startsAtTurn: number;
   activeArea: {
     qMin: number;
@@ -88,6 +128,9 @@ export type BattleScenario = {
   deployments: UnitDeployment[];
   stages: BattleStage[];
   victory: VictoryCondition[];
+  zones?: BattleZone[];
+  objectives?: BattleObjective[];
+  events?: ScenarioEvent[];
   introContentId?: ContentId;
   aftermathContentId?: ContentId;
 };
@@ -121,6 +164,7 @@ export type BattleResult = {
   winnerSideId: SideId;
   playerSideId: SideId;
   rank: "S" | "A" | "B" | "C" | "D";
+  outcome: string;
   chronicle: string[];
 };
 
@@ -133,6 +177,7 @@ export type BattleState = {
   currentStageId: BattleStageId;
   selectedUnitId: UnitId | null;
   units: Record<UnitId, Unit>;
+  firedEventIds: string[];
   log: BattleLogEntry[];
   result: BattleResult | null;
 };

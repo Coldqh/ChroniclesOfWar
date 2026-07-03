@@ -37,6 +37,7 @@ export function createInitialBattleState(scenario: BattleScenario, playerSideId:
     currentStageId: scenario.stages[0]?.id ?? "main",
     selectedUnitId: null,
     units,
+    firedEventIds: [],
     log: [
       {
         id: "start",
