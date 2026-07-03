@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Build and publish to gh-pages
 
 on:
   push:
@@ -7,16 +7,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
+  group: gh-pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,25 +28,32 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: |
+          rm -f package-lock.json
+          rm -rf node_modules
+          npm install --no-audit --no-fund --no-package-lock
 
       - name: Build
         run: npm run build
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
+      - name: Prepare static files
+        run: |
+          rm -rf /tmp/chronicles-pages
+          mkdir -p /tmp/chronicles-pages
+          cp -R dist/. /tmp/chronicles-pages/
+          touch /tmp/chronicles-pages/.nojekyll
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      - name: Publish to gh-pages branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-    runs-on: ubuntu-latest
-    needs: build
+          git fetch origin gh-pages || true
+          git switch --orphan gh-pages
 
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          git rm -rf . || true
+          cp -R /tmp/chronicles-pages/. .
+
+          git add .
+          git commit -m "Deploy GitHub Pages" || echo "No changes to deploy"
+          git push --force origin gh-pages
