@@ -13,8 +13,12 @@ type HexMapProps = {
   onAttack: (attackerId: string, targetId: string) => void;
 };
 
-const HEX_W = 74;
-const HEX_H = 64;
+const HEX_W = 72;
+const HEX_H = 82;
+const HEX_X_STEP = HEX_W;
+const HEX_Y_STEP = HEX_H * 0.75;
+const MAP_PADDING_X = 28;
+const MAP_PADDING_Y = 24;
 
 export function HexMap({
   scenario,
@@ -50,8 +54,8 @@ export function HexMap({
     }
   }
 
-  const width = scenario.map.width * HEX_W + 80;
-  const height = scenario.map.height * (HEX_H * 0.78) + 80;
+  const width = scenario.map.width * HEX_X_STEP + HEX_W + MAP_PADDING_X * 2;
+  const height = scenario.map.height * HEX_Y_STEP + HEX_H + MAP_PADDING_Y * 2;
 
   return (
     <section className="map-frame">
@@ -64,8 +68,8 @@ export function HexMap({
           const key = hexKey(tile.coord);
           const unit = unitsByHex.get(key);
           const terrain = terrainById.get(tile.terrainId);
-          const x = tile.coord.q * HEX_W + (tile.coord.r % 2) * (HEX_W / 2) + 24;
-          const y = tile.coord.r * (HEX_H * 0.78) + 22;
+          const x = tile.coord.q * HEX_X_STEP + (tile.coord.r % 2) * (HEX_W / 2) + MAP_PADDING_X;
+          const y = tile.coord.r * HEX_Y_STEP + MAP_PADDING_Y;
           const isSelected = selectedUnit && sameHex(selectedUnit.position, tile.coord);
           const canMove = movementKeys.has(key);
           const canTarget = unit ? targetIds.has(unit.id) : false;
