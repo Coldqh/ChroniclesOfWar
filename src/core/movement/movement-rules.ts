@@ -49,9 +49,16 @@ export function getMovementRange(scenario: BattleScenario, state: BattleState, u
       const [q, r] = key.split(",").map(Number);
       return { q, r };
     })
-    .filter((coord) => !sameHex(coord, unit.position));
+    .filter((coord) => !sameHex(coord, unit.position) && !getUnitAt(state, coord));
 }
 
 export function canMoveTo(scenario: BattleScenario, state: BattleState, unit: Unit, to: HexCoord): boolean {
+  if (unit.hasMoved || unit.status === "destroyed" || unit.status === "routed" || unit.status === "skipping") {
+    return false;
+  }
+
+  const occupied = getUnitAt(state, to);
+  if (occupied && occupied.id !== unit.id) return false;
+
   return getMovementRange(scenario, state, unit).some((coord) => sameHex(coord, to));
 }

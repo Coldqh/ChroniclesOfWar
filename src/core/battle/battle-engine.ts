@@ -1,10 +1,17 @@
 import type { BattleCommand } from "./battle-commands";
 import type { BattleScenario, BattleState, Unit } from "./battle-types";
-import { sameHex, hexDistance } from "../hex/hex-utils";
-import { canMoveTo, getMovementRange } from "../movement/movement-rules";
+import { hexDistance } from "../hex/hex-utils";
+import { canMoveTo, getMovementRange, getUnitAt } from "../movement/movement-rules";
 import { resolveCombat } from "../combat/combat-resolver";
+import { getCombatPreview } from "../combat/combat-preview";
 import { getMoraleStatus, recoverMorale } from "../morale/morale-rules";
 import { checkVictory } from "../victory/victory-rules";
+
+type LogTone = "info" | "success" | "danger" | "history";
+
+function canUnitReceiveOrders(unit: Unit): boolean {
+  return unit.status !== "destroyed" && unit.status !== "routed" && unit.status !== "skipping";
+}
 
 export function applyBattleCommand(scenario: BattleScenario, state: BattleState, command: BattleCommand): BattleState {
   if (state.phase === "finished") return state;
@@ -12,14 +19,27 @@ export function applyBattleCommand(scenario: BattleScenario, state: BattleState,
   switch (command.type) {
     case "SELECT_UNIT": {
       if (!command.unitId) return { ...state, selectedUnitId: null };
+
       const unit = state.units[command.unitId];
-      if (!unit || unit.sideId !== state.activeSideId) return state;
+      if (!unit) return addLog(state, "Отряд не найден.", "danger");
+      if (unit.sideId !== state.activeSideId) return addLog(state, "Нельзя выбрать отряд другой стороны.", "danger");
+      if (!canUnitReceiveOrders(unit)) return addLog(state, "Этот отряд не может получать приказы.", "danger");
+
       return { ...state, selectedUnitId: command.unitId };
     }
 
     case "MOVE_UNIT": {
       const unit = state.units[command.unitId];
-      if (!unit || unit.sideId !== state.activeSideId) return state;
+      if (!unit) return addLog(state, "Отряд не найден.", "danger");
+      if (unit.sideId !== state.activeSideId) return addLog(state, "Сейчас ходит другая сторона.", "danger");
+      if (!canUnitReceiveOrders(unit)) return addLog(state, "Этот отряд не может двигаться.", "danger");
+      if (unit.hasMoved) return addLog(state, "Этот отряд уже двигался.", "danger");
+
+      const occupied = getUnitAt(state, command.to);
+      if (occupied && occupied.id !== unit.id) {
+        return addLog(state, "Клетка занята.", "danger");
+      }
+
       if (!canMoveTo(scenario, state, unit, command.to)) {
         return addLog(state, "Приказ невозможен: клетка недоступна.", "danger");
       }
@@ -42,7 +62,21 @@ export function applyBattleCommand(scenario: BattleScenario, state: BattleState,
     case "ATTACK_UNIT": {
       const attacker = state.units[command.attackerId];
       const target = state.units[command.targetId];
-      if (!attacker || !target || attacker.sideId !== state.activeSideId) return state;
+
+      if (!attacker) return addLog(state, "Атакующий отряд не найден.", "danger");
+      if (!target) return addLog(state, "Цель не найдена.", "danger");
+      if (attacker.sideId !== state.activeSideId) return addLog(state, "Сейчас ходит другая сторона.", "danger");
+      if (!canUnitReceiveOrders(attacker)) return addLog(state, "Этот отряд не может атаковать.", "danger");
+      if (attacker.hasAttacked) return addLog(state, "Этот отряд уже атаковал.", "danger");
+      if (attacker.sideId === target.sideId) return addLog(state, "Нельзя атаковать союзника.", "danger");
+      if (target.status === "destroyed" || target.status === "routed") {
+        return addLog(state, "Цель уже выведена из боя.", "danger");
+      }
+
+      const preview = getCombatPreview(scenario, state, attacker, target);
+      if (!preview.canAttack) {
+        return addLog(state, preview.reason ?? "Атака невозможна.", "danger");
+      }
 
       const result = resolveCombat(scenario, state, attacker, target);
       if (!result.canAttack) {
@@ -64,6 +98,7 @@ export function applyBattleCommand(scenario: BattleScenario, state: BattleState,
 
       let nextState: BattleState = {
         ...state,
+        selectedUnitId: updatedAttacker.status === "destroyed" || updatedAttacker.status === "routed" ? null : state.selectedUnitId,
         units: {
           ...state.units,
           [attacker.id]: updatedAttacker,
@@ -79,7 +114,7 @@ export function applyBattleCommand(scenario: BattleScenario, state: BattleState,
     }
 
     case "END_TURN": {
-      return endTurn(scenario, state);
+      return finishIfNeeded(scenario, endTurn(scenario, state));
     }
   }
 }
@@ -94,8 +129,20 @@ export function endTurn(scenario: BattleScenario, state: BattleState): BattleSta
 
   const units = Object.fromEntries(
     Object.values(state.units).map((unit) => {
+      if (unit.status === "destroyed" || unit.status === "routed") {
+        return [
+          unit.id,
+          {
+            ...unit,
+            hasMoved: false,
+            hasAttacked: false,
+          },
+        ];
+      }
+
       const recoveredMorale = unit.sideId === nextSide.id ? recoverMorale(unit) : unit.morale;
       const status = getMoraleStatus({ ...unit, morale: recoveredMorale });
+
       return [
         unit.id,
         {
@@ -126,35 +173,42 @@ export function endTurn(scenario: BattleScenario, state: BattleState): BattleSta
 export function runBasicAiTurn(scenario: BattleScenario, state: BattleState): BattleState {
   let nextState = state;
   const aiUnits = Object.values(nextState.units).filter(
-    (unit) => unit.sideId === nextState.activeSideId && unit.status !== "destroyed" && unit.status !== "routed",
+    (unit) => unit.sideId === nextState.activeSideId && canUnitReceiveOrders(unit),
   );
 
   for (const unit of aiUnits) {
     const freshUnit = nextState.units[unit.id];
-    if (!freshUnit || freshUnit.status === "destroyed" || freshUnit.status === "routed") continue;
+    if (!freshUnit || !canUnitReceiveOrders(freshUnit)) continue;
 
     const enemies = Object.values(nextState.units).filter(
       (target) => target.sideId !== freshUnit.sideId && target.status !== "destroyed" && target.status !== "routed",
     );
+
     if (enemies.length === 0) break;
 
-    const targetInRange = enemies
-      .filter((target) => hexDistance(freshUnit.position, target.position) <= freshUnit.type.range)
-      .sort((a, b) => a.currentHp - b.currentHp)[0];
+    if (!freshUnit.hasAttacked) {
+      const targetInRange = enemies
+        .filter((target) => getCombatPreview(scenario, nextState, freshUnit, target).canAttack)
+        .sort((a, b) => a.currentHp - b.currentHp)[0];
 
-    if (targetInRange) {
-      nextState = applyBattleCommand(scenario, nextState, {
-        type: "ATTACK_UNIT",
-        attackerId: freshUnit.id,
-        targetId: targetInRange.id,
-      });
-      continue;
+      if (targetInRange) {
+        nextState = applyBattleCommand(scenario, nextState, {
+          type: "ATTACK_UNIT",
+          attackerId: freshUnit.id,
+          targetId: targetInRange.id,
+        });
+        continue;
+      }
     }
 
+    const refreshedAfterAttack = nextState.units[freshUnit.id];
+    if (!refreshedAfterAttack || refreshedAfterAttack.hasMoved || !canUnitReceiveOrders(refreshedAfterAttack)) continue;
+
     const nearestEnemy = enemies.sort(
-      (a, b) => hexDistance(freshUnit.position, a.position) - hexDistance(freshUnit.position, b.position),
+      (a, b) => hexDistance(refreshedAfterAttack.position, a.position) - hexDistance(refreshedAfterAttack.position, b.position),
     )[0];
-    const range = getMovementRange(scenario, nextState, freshUnit);
+
+    const range = getMovementRange(scenario, nextState, refreshedAfterAttack);
     const bestMove = range.sort(
       (a, b) => hexDistance(a, nearestEnemy.position) - hexDistance(b, nearestEnemy.position),
     )[0];
@@ -162,13 +216,13 @@ export function runBasicAiTurn(scenario: BattleScenario, state: BattleState): Ba
     if (bestMove) {
       nextState = applyBattleCommand(scenario, nextState, {
         type: "MOVE_UNIT",
-        unitId: freshUnit.id,
+        unitId: refreshedAfterAttack.id,
         to: bestMove,
       });
     }
   }
 
-  return endTurn(scenario, nextState);
+  return finishIfNeeded(scenario, endTurn(scenario, nextState));
 }
 
 function finishIfNeeded(scenario: BattleScenario, state: BattleState): BattleState {
@@ -188,7 +242,7 @@ function getCurrentStageId(scenario: BattleScenario, turn: number): string {
     .find((stage) => turn >= stage.startsAtTurn)?.id ?? scenario.stages[0]?.id ?? "main";
 }
 
-function addLog(state: BattleState, text: string, tone: "info" | "success" | "danger" | "history"): BattleState {
+function addLog(state: BattleState, text: string, tone: LogTone): BattleState {
   return {
     ...state,
     log: [

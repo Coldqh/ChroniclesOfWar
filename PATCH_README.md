@@ -1,36 +1,17 @@
-# PATCH MODE — No Actions Static Docs Deploy
+# PATCH MODE — Battle Rules Correctness
 
-Причина красного креста:
-- `.github/workflows/build-docs.yml` запускает GitHub Actions.
-- Workflow пересобирает `docs` и пушит обратно в `main`.
-- Это создаёт лишние красные статусы, конфликты и diverged branch.
+Changed files:
+- src/core/battle/battle-engine.ts
+- src/core/combat/combat-preview.ts
+- src/core/movement/movement-rules.ts
 
-Рабочие проекты у пользователя устроены проще:
-- `main`
-- `index.html`
-- относительные пути
-- без Vite Pages artifact
-- без auto-commit workflow
-
-Для ChroniclesOfWar оставляем:
-- Vite build локально
-- `npm run docs:build`
-- GitHub Pages: `main / docs`
-- никаких Actions
-
-Как применить:
+Apply into C:\ChroniclesOfWar, then run:
 
 ```powershell
 cd C:\ChroniclesOfWar
-.\fix-static-docs-deploy.ps1
+npm run build
+npm run docs:build
+git add -A
+git commit -m "Stabilize battle rules"
+git push origin main
 ```
-
-Если PowerShell блокирует запуск:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\fix-static-docs-deploy.ps1
-```
-
-После этого:
-- Settings -> Pages -> Deploy from branch -> main -> /docs
-- Actions можно игнорировать: новых запусков быть не должно.
