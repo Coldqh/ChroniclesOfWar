@@ -37,12 +37,11 @@ export function createInitialBattleState(scenario: BattleScenario, playerSideId:
     currentStageId: scenario.stages[0]?.id ?? "main",
     selectedUnitId: null,
     units,
-    firedEventIds: [],
     log: [
       {
         id: "start",
         turn: 1,
-        text: "Битва началась. Выберите отряд и отдайте первый приказ.",
+        text: "Битва началась. Разбейте все боеспособные отряды противника.",
         tone: "history",
       },
     ],

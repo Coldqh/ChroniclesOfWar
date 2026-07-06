@@ -1,19 +1,29 @@
-# PATCH MODE — Insert New Crécy Map v0.1.10
+# PATCH MODE — Crecy Terrain Sync + Remove Objectives v0.1.11
 
 Changed files:
 - package.json
 - src/app/version.ts
-- src/assets/maps/crecy-1346-stage-advance.png
+- src/data/battles/crecy-1346/crecy-1346.map.ts
+- src/data/battles/crecy-1346/crecy-1346.scenario.ts
+- src/data/battles/crecy-1346/crecy-1346.victory.ts
+- src/core/battle/battle-types.ts
+- src/core/battle/battle-state.ts
+- src/core/battle/battle-engine.ts
+- src/core/victory/victory-rules.ts
+- src/features/battle/BattleScreen.tsx
+- src/features/battle/BattleHud.tsx
+- cleanup_v0111.ps1
 
-What changed:
-- Replaced Crécy stage map underlay with the newly provided map.
-- Resized/cropped map to exact game container size: 992x684.
-- Kept the map without baked hex grid.
-- The game should still render the clickable hex grid on top if v0.1.9 map layout system is applied.
+Cleanup script deletes:
+- src/features/battle/ScenarioObjectivesPanel.tsx
+- src/features/battle/BattleScenarioGameplay.css
+- src/core/scenario/scenario-objectives.ts
+- src/core/scenario/scenario-utils.ts
 
-Verify:
+Apply:
 ```powershell
 cd C:\ChroniclesOfWar
+powershell -ExecutionPolicy Bypass -File .\cleanup_v0111.ps1
 npm run build
 npm run docs:build
 ```
@@ -22,6 +32,6 @@ Commit:
 ```powershell
 cd C:\ChroniclesOfWar
 git add -A
-git commit -m "Insert new Crecy map v0.1.10"
+git commit -m "Sync Crecy terrain and remove objectives v0.1.11"
 git push origin main
 ```

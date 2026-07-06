@@ -1,15 +1,15 @@
 import type { HexMapData } from "../../../core/hex/hex-types";
 
 const crecyTerrainRows = [
-  ["plain", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "plain"],
-  ["plain", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "plain"],
-  ["plain", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "plain"],
-  ["plain", "plain", "plain", "plain", "mud", "mud", "plain", "plain", "plain", "plain", "plain", "plain"],
-  ["plain", "plain", "plain", "plain", "mud", "mud", "plain", "plain", "plain", "road", "plain", "plain"],
-  ["plain", "plain", "plain", "plain", "mud", "mud", "plain", "plain", "road", "plain", "plain", "plain"],
-  ["plain", "plain", "plain", "plain", "mud", "mud", "plain", "road", "plain", "plain", "plain", "plain"],
-  ["plain", "plain", "plain", "plain", "plain", "plain", "road", "plain", "plain", "plain", "plain", "plain"],
-  ["plain", "plain", "plain", "plain", "plain", "road", "plain", "plain", "plain", "plain", "plain", "plain"],
+  ["hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill"],
+  ["hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill"],
+  ["hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill", "hill"],
+  ["plain", "plain", "plain", "mud", "mud", "mud", "plain", "plain", "plain", "plain", "plain", "road"],
+  ["plain", "plain", "plain", "mud", "mud", "mud", "plain", "plain", "plain", "plain", "road", "plain"],
+  ["plain", "plain", "plain", "mud", "mud", "mud", "plain", "plain", "plain", "road", "plain", "plain"],
+  ["plain", "plain", "plain", "mud", "mud", "mud", "plain", "plain", "road", "plain", "plain", "plain"],
+  ["plain", "plain", "plain", "mud", "mud", "mud", "plain", "road", "plain", "plain", "plain", "plain"],
+  ["plain", "plain", "plain", "mud", "mud", "plain", "plain", "road", "plain", "plain", "plain", "plain"],
 ] as const;
 
 export const crecy1346Map: HexMapData = {

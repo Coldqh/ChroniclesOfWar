@@ -1,5 +1,5 @@
 import type { BattleCommand } from "./battle-commands";
-import type { BattleScenario, BattleState, ScenarioEvent, Unit } from "./battle-types";
+import type { BattleScenario, BattleState, Unit } from "./battle-types";
 import { hexDistance } from "../hex/hex-utils";
 import { canMoveTo, getMovementRange, getUnitAt } from "../movement/movement-rules";
 import { resolveCombat } from "../combat/combat-resolver";
@@ -171,11 +171,7 @@ export function endTurn(scenario: BattleScenario, state: BattleState): BattleSta
 
   if (currentStage !== state.currentStageId) {
     const stage = scenario.stages.find((item) => item.id === currentStage);
-    nextState = addLog(nextState, `Новый этап: ${stage?.title ?? currentStage}. ${stage?.objective ?? stage?.summary ?? ""}`, "history");
-  }
-
-  if (wrapped) {
-    nextState = triggerScenarioEvents(scenario, nextState);
+    nextState = addLog(nextState, `Новый этап: ${stage?.title ?? currentStage}. ${stage?.summary ?? ""}`, "history");
   }
 
   return nextState;
@@ -234,25 +230,6 @@ export function runBasicAiTurn(scenario: BattleScenario, state: BattleState): Ba
   }
 
   return finishIfNeeded(scenario, endTurn(scenario, nextState));
-}
-
-function triggerScenarioEvents(scenario: BattleScenario, state: BattleState): BattleState {
-  let nextState = state;
-
-  for (const event of scenario.events ?? []) {
-    if (event.turn > state.turn || nextState.firedEventIds.includes(event.id)) continue;
-    nextState = markScenarioEventFired(nextState, event);
-    nextState = addLog(nextState, `${event.title}: ${event.text}`, event.tone ?? "history");
-  }
-
-  return nextState;
-}
-
-function markScenarioEventFired(state: BattleState, event: ScenarioEvent): BattleState {
-  return {
-    ...state,
-    firedEventIds: [...state.firedEventIds, event.id],
-  };
 }
 
 function finishIfNeeded(scenario: BattleScenario, state: BattleState): BattleState {

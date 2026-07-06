@@ -11,10 +11,8 @@ import { getMovementRange } from "../../core/movement/movement-rules";
 import { BattleHud } from "./BattleHud";
 import { CombatPreviewPanel } from "./CombatPreviewPanel";
 import { HexMap } from "./HexMap";
-import { ScenarioObjectivesPanel } from "./ScenarioObjectivesPanel";
 import { UnitPanel } from "./UnitPanel";
 import "./BattleReadability.css";
-import "./BattleScenarioGameplay.css";
 
 type BattleScreenProps = {
   scenario: BattleScenario;
@@ -143,8 +141,6 @@ export function BattleScreen({ scenario, state, setState, theme, onToggleTheme, 
           >
             Завершить ход
           </button>
-
-          <ScenarioObjectivesPanel scenario={scenario} state={state} />
 
           <section className="card-panel tile-info-panel">
             <h3>Клетка</h3>
