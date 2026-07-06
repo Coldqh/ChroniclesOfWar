@@ -9,6 +9,11 @@ export type CombatPreview = {
   targetHpAfter: number;
   targetCountAfter: number;
   canAttack: boolean;
+  distance: number;
+  terrainName: string;
+  terrainDefenseModifier: number;
+  roleAttackModifier: number;
+  roleAttackMultiplier: number;
   reason?: string;
 };
 

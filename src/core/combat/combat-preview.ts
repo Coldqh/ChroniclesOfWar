@@ -1,7 +1,12 @@
 import type { BattleScenario, BattleState, Unit } from "../battle/battle-types";
 import type { CombatPreview } from "./combat-types";
 import { hexDistance } from "../hex/hex-utils";
-import { clampTerrainDefense, getTerrainAtCoord, getTerrainAttackMultiplier } from "./terrain-combat";
+import {
+  clampTerrainDefense,
+  getRoleAttackModifier,
+  getTerrainAtCoord,
+  getTerrainAttackMultiplier,
+} from "./terrain-combat";
 
 function getNearbyCommanderBonus(state: BattleState, unit: Unit): number {
   const commanders = Object.values(state.units).filter(
@@ -12,30 +17,32 @@ function getNearbyCommanderBonus(state: BattleState, unit: Unit): number {
 }
 
 export function getCombatPreview(scenario: BattleScenario, state: BattleState, attacker: Unit, target: Unit): CombatPreview {
+  const distance = hexDistance(attacker.position, target.position);
+  const targetTerrain = getTerrainAtCoord(scenario, target.position);
+  const terrainDefense = clampTerrainDefense(targetTerrain?.defenseBonus ?? 0);
+  const roleAttackModifier = getRoleAttackModifier(targetTerrain, attacker.type.role);
+  const roleAttackMultiplier = getTerrainAttackMultiplier(targetTerrain, attacker.type.role);
+  const terrainName = targetTerrain?.name ?? "Неизвестно";
+
   if (attacker.sideId === target.sideId) {
-    return blocked(attacker.id, target.id, target.currentHp, target.currentCount, "Нельзя атаковать союзника.");
+    return blocked(attacker.id, target.id, target.currentHp, target.currentCount, distance, terrainName, terrainDefense, roleAttackModifier, roleAttackMultiplier, "Нельзя атаковать союзника.");
   }
 
   if (attacker.hasAttacked) {
-    return blocked(attacker.id, target.id, target.currentHp, target.currentCount, "Отряд уже атаковал.");
+    return blocked(attacker.id, target.id, target.currentHp, target.currentCount, distance, terrainName, terrainDefense, roleAttackModifier, roleAttackMultiplier, "Этот отряд уже атаковал.");
   }
 
   if (attacker.status === "destroyed" || attacker.status === "routed" || attacker.status === "skipping") {
-    return blocked(attacker.id, target.id, target.currentHp, target.currentCount, "Отряд не может атаковать.");
+    return blocked(attacker.id, target.id, target.currentHp, target.currentCount, distance, terrainName, terrainDefense, roleAttackModifier, roleAttackMultiplier, "Отряд не может атаковать.");
   }
 
   if (target.status === "destroyed" || target.status === "routed") {
-    return blocked(attacker.id, target.id, target.currentHp, target.currentCount, "Цель уже выведена из боя.");
+    return blocked(attacker.id, target.id, target.currentHp, target.currentCount, distance, terrainName, terrainDefense, roleAttackModifier, roleAttackMultiplier, "Цель уже выведена из боя.");
   }
 
-  const distance = hexDistance(attacker.position, target.position);
   if (distance > attacker.type.range) {
-    return blocked(attacker.id, target.id, target.currentHp, target.currentCount, "Цель вне дальности.");
+    return blocked(attacker.id, target.id, target.currentHp, target.currentCount, distance, terrainName, terrainDefense, roleAttackModifier, roleAttackMultiplier, "Цель вне дальности.");
   }
-
-  const targetTerrain = getTerrainAtCoord(scenario, target.position);
-  const terrainDefense = clampTerrainDefense(targetTerrain?.defenseBonus ?? 0);
-  const roleAttackMultiplier = getTerrainAttackMultiplier(targetTerrain, attacker.type.role);
 
   const strengthRatio = Math.max(0.25, attacker.currentCount / attacker.type.maxCount);
   const moraleRatio = Math.max(0.45, attacker.morale / attacker.type.morale);
@@ -56,10 +63,26 @@ export function getCombatPreview(scenario: BattleScenario, state: BattleState, a
     targetHpAfter,
     targetCountAfter,
     canAttack: true,
+    distance,
+    terrainName,
+    terrainDefenseModifier: terrainDefense,
+    roleAttackModifier,
+    roleAttackMultiplier,
   };
 }
 
-function blocked(attackerId: string, targetId: string, targetHp: number, targetCount: number, reason: string): CombatPreview {
+function blocked(
+  attackerId: string,
+  targetId: string,
+  targetHp: number,
+  targetCount: number,
+  distance: number,
+  terrainName: string,
+  terrainDefenseModifier: number,
+  roleAttackModifier: number,
+  roleAttackMultiplier: number,
+  reason: string,
+): CombatPreview {
   return {
     attackerId,
     targetId,
@@ -69,6 +92,11 @@ function blocked(attackerId: string, targetId: string, targetHp: number, targetC
     targetHpAfter: targetHp,
     targetCountAfter: targetCount,
     canAttack: false,
+    distance,
+    terrainName,
+    terrainDefenseModifier,
+    roleAttackModifier,
+    roleAttackMultiplier,
     reason,
   };
 }

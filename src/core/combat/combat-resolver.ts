@@ -24,6 +24,7 @@ export function resolveCombat(scenario: BattleScenario, state: BattleState, atta
   const moraleAfter = Math.max(0, target.morale - moraleDamage);
   const targetDestroyed = countAfter <= 0 || targetHpAfter <= 0;
   const targetRouted = !targetDestroyed && moraleAfter <= 0;
+  const statusText = targetDestroyed ? " Отряд уничтожен." : targetRouted ? " Отряд бежит." : "";
 
   return {
     ...preview,
@@ -36,6 +37,6 @@ export function resolveCombat(scenario: BattleScenario, state: BattleState, atta
     moraleDamage,
     targetRouted,
     targetDestroyed,
-    logText: `${attacker.type.name} атакуют ${target.type.name}: потери ${actualKills}, мораль -${moraleDamage}.`,
+    logText: `${attacker.type.name} атакуют ${target.type.name}: урон ${actualDamage}, потери ${actualKills}, мораль -${moraleDamage}.${statusText}`,
   };
 }
