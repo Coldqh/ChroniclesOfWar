@@ -13,6 +13,7 @@ import { CombatPreviewPanel } from "./CombatPreviewPanel";
 import { HexMap } from "./HexMap";
 import { UnitPanel } from "./UnitPanel";
 import "./BattleReadability.css";
+import "./BattleTerrainDebug.css";
 
 type BattleScreenProps = {
   scenario: BattleScenario;
@@ -40,6 +41,7 @@ export function BattleScreen({ scenario, state, setState, theme, onToggleTheme, 
   const isPlayerTurn = state.activeSideId === state.playerSideId;
   const [battleMessage, setBattleMessage] = useState("Выберите свой отряд.");
   const [inspectedCoord, setInspectedCoord] = useState<HexCoord | null>(null);
+  const [showTerrainDebug, setShowTerrainDebug] = useState(false);
 
   const targetsInRange = useMemo(() => {
     if (!selectedUnit) return [];
@@ -122,6 +124,7 @@ export function BattleScreen({ scenario, state, setState, theme, onToggleTheme, 
           activeStage={activeStage}
           movementRange={movementRange}
           targetsInRange={targetsInRange}
+          showTerrainDebug={showTerrainDebug}
           onSelectUnit={(unitId) => dispatch({ type: "SELECT_UNIT", unitId })}
           onMove={(unitId, to) => dispatch({ type: "MOVE_UNIT", unitId, to })}
           onAttack={(attackerId, targetId) => dispatch({ type: "ATTACK_UNIT", attackerId, targetId })}
@@ -140,6 +143,13 @@ export function BattleScreen({ scenario, state, setState, theme, onToggleTheme, 
             onClick={() => dispatch({ type: "END_TURN" })}
           >
             Завершить ход
+          </button>
+
+          <button
+            className={`ghost-button full-width terrain-debug-toggle ${showTerrainDebug ? "active" : ""}`}
+            onClick={() => setShowTerrainDebug((value) => !value)}
+          >
+            Terrain Debug: {showTerrainDebug ? "ON" : "OFF"}
           </button>
 
           <section className="card-panel tile-info-panel">

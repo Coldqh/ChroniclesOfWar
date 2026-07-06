@@ -1,0 +1,66 @@
+.terrain-debug-toggle {
+  margin-top: 8px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.terrain-debug-toggle.active {
+  border-color: rgba(116, 52, 27, 0.72);
+  background: rgba(182, 69, 43, 0.18);
+}
+
+.terrain-debug-code {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(40, 22, 9, 0.55);
+  border-radius: 999px;
+  background: rgba(255, 239, 190, 0.74);
+  color: #2d190d;
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1;
+  pointer-events: none;
+  box-shadow: 0 2px 7px rgba(32, 18, 8, 0.3);
+}
+
+.terrain-debug-plain {
+  background: rgba(226, 205, 126, 0.78);
+}
+
+.terrain-debug-hill {
+  background: rgba(196, 147, 74, 0.82);
+}
+
+.terrain-debug-mud {
+  background: rgba(96, 64, 42, 0.86);
+  color: #f5dfab;
+}
+
+.terrain-debug-road {
+  background: rgba(226, 186, 112, 0.86);
+}
+
+.terrain-debug-forest {
+  background: rgba(70, 103, 62, 0.86);
+  color: #f5dfab;
+}
+
+[data-theme="dark"] .terrain-debug-toggle.active {
+  border-color: rgba(229, 189, 103, 0.62);
+  background: rgba(229, 189, 103, 0.14);
+}
+
+[data-theme="dark"] .terrain-debug-code {
+  border-color: rgba(238, 226, 199, 0.35);
+  background: rgba(0, 0, 0, 0.68);
+  color: #f0d28c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+}

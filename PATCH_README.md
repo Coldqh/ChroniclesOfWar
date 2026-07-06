@@ -1,29 +1,27 @@
-# PATCH MODE — Crecy Terrain Sync + Remove Objectives v0.1.11
+# PATCH MODE — Crecy Deployment + Terrain Debug v0.1.12
 
 Changed files:
 - package.json
 - src/app/version.ts
-- src/data/battles/crecy-1346/crecy-1346.map.ts
-- src/data/battles/crecy-1346/crecy-1346.scenario.ts
-- src/data/battles/crecy-1346/crecy-1346.victory.ts
-- src/core/battle/battle-types.ts
-- src/core/battle/battle-state.ts
-- src/core/battle/battle-engine.ts
-- src/core/victory/victory-rules.ts
+- src/data/battles/crecy-1346/crecy-1346.deployments.ts
 - src/features/battle/BattleScreen.tsx
-- src/features/battle/BattleHud.tsx
-- cleanup_v0111.ps1
+- src/features/battle/HexMap.tsx
+- src/features/battle/BattleTerrainDebug.css
 
-Cleanup script deletes:
-- src/features/battle/ScenarioObjectivesPanel.tsx
-- src/features/battle/BattleScenarioGameplay.css
-- src/core/scenario/scenario-objectives.ts
-- src/core/scenario/scenario-utils.ts
+What changed:
+- Version bumped to v0.1.12.
+- Added compact Terrain Debug ON/OFF button in the battle side panel.
+- Terrain Debug shows P/H/M/R/F letters on map hexes.
+- Debug labels render above map/grid and below unit tokens.
+- French units moved off muddy starting tiles.
+- English units remain on northern high ground.
+- No objectives were re-added.
+- No combat formulas were changed.
+- No deployment / Pages / Actions / vite changes.
 
-Apply:
+Verify:
 ```powershell
 cd C:\ChroniclesOfWar
-powershell -ExecutionPolicy Bypass -File .\cleanup_v0111.ps1
 npm run build
 npm run docs:build
 ```
@@ -32,6 +30,6 @@ Commit:
 ```powershell
 cd C:\ChroniclesOfWar
 git add -A
-git commit -m "Sync Crecy terrain and remove objectives v0.1.11"
+git commit -m "Sync Crecy deployment and add terrain debug v0.1.12"
 git push origin main
 ```

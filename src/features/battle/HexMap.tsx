@@ -1,4 +1,4 @@
-import type { BattleScenario, BattleStage, BattleState, Unit } from "../../core/battle/battle-types";
+import type { BattleScenario, BattleStage, BattleState, TerrainData, Unit } from "../../core/battle/battle-types";
 import type { HexCoord } from "../../core/hex/hex-types";
 import { hexKey, sameHex } from "../../core/hex/hex-utils";
 import { getBattleMapLayout } from "../../data/maps/battle-map-layouts";
@@ -9,6 +9,7 @@ type HexMapProps = {
   activeStage: BattleStage;
   movementRange: HexCoord[];
   targetsInRange: Unit[];
+  showTerrainDebug: boolean;
   onSelectUnit: (unitId: string | null) => void;
   onMove: (unitId: string, to: HexCoord) => void;
   onAttack: (attackerId: string, targetId: string) => void;
@@ -24,12 +25,30 @@ function toClassToken(value: string) {
   return value.replace(/[^a-zA-Z0-9_-]/g, "-");
 }
 
+function getTerrainDebugCode(terrain: TerrainData | undefined): string {
+  switch (terrain?.id) {
+    case "plain":
+      return "P";
+    case "hill":
+      return "H";
+    case "mud":
+      return "M";
+    case "road":
+      return "R";
+    case "forest":
+      return "F";
+    default:
+      return "?";
+  }
+}
+
 export function HexMap({
   scenario,
   state,
   activeStage,
   movementRange,
   targetsInRange,
+  showTerrainDebug,
   onSelectUnit,
   onMove,
   onAttack,
@@ -122,7 +141,7 @@ export function HexMap({
       </div>
 
       <div
-        className={`hex-map battle-${toClassToken(scenario.id)} stage-${toClassToken(activeStage.id)} layout-${toClassToken(layout.id)} ${hasImageUnderlay ? "has-stage-map" : ""} ${layout.showTerrainFill ? "show-terrain-fill" : "hide-terrain-fill"} ${layout.showHexLabels ? "show-hex-labels" : "hide-hex-labels"} ${layout.showGridLines ? "show-grid-lines" : "hide-grid-lines"}`}
+        className={`hex-map battle-${toClassToken(scenario.id)} stage-${toClassToken(activeStage.id)} layout-${toClassToken(layout.id)} ${hasImageUnderlay ? "has-stage-map" : ""} ${layout.showTerrainFill ? "show-terrain-fill" : "hide-terrain-fill"} ${layout.showHexLabels ? "show-hex-labels" : "hide-hex-labels"} ${layout.showGridLines ? "show-grid-lines" : "hide-grid-lines"} ${showTerrainDebug ? "terrain-debug-on" : ""}`}
         style={{ width, height }}
       >
         {hasImageUnderlay ? (
@@ -167,6 +186,11 @@ export function HexMap({
               title={`${terrain?.name ?? tile.terrainId} · ход ${terrain?.moveCost ?? "?"} · защита ${terrain?.defenseBonus ?? 0}`}
             >
               <span className="hex-label">{tile.label}</span>
+              {showTerrainDebug && (
+                <span className={`terrain-debug-code terrain-debug-${tile.terrainId}`}>
+                  {getTerrainDebugCode(terrain)}
+                </span>
+              )}
               {activeUnit && (
                 <span className={`unit-token side-${activeUnit.sideId} status-${activeUnit.status}`}>
                   <span className="unit-icon">{activeUnit.type.icon}</span>
