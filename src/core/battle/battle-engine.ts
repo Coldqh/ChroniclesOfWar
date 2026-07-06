@@ -1,11 +1,18 @@
 import type { BattleCommand } from "./battle-commands";
 import type { BattleScenario, BattleState, Unit } from "./battle-types";
 import { hexDistance } from "../hex/hex-utils";
-import { canMoveTo, getMovementRange, getUnitAt } from "../movement/movement-rules";
+import {
+  canMoveTo,
+  getMovementBlockMessage,
+  getMovementBlockReason,
+  getMovementRange,
+  getUnitAt,
+} from "../movement/movement-rules";
 import { resolveCombat } from "../combat/combat-resolver";
 import { getCombatPreview } from "../combat/combat-preview";
 import { getMoraleStatus, recoverMorale } from "../morale/morale-rules";
 import { checkVictory } from "../victory/victory-rules";
+import { getAdjacentEnemyUnits, isUnitEngaged } from "../engagement/engagement-rules";
 
 type LogTone = "info" | "success" | "danger" | "history";
 
@@ -33,7 +40,9 @@ export function applyBattleCommand(scenario: BattleScenario, state: BattleState,
       if (unit.hasMoved) return addLog(state, "Этот отряд уже двигался.", "danger");
       const occupied = getUnitAt(state, command.to);
       if (occupied && occupied.id !== unit.id) return addLog(state, "Клетка занята.", "danger");
-      if (!canMoveTo(scenario, state, unit, command.to)) return addLog(state, "Клетка недоступна.", "danger");
+      if (!canMoveTo(scenario, state, unit, command.to)) {
+        return addLog(state, getMovementBlockMessage(getMovementBlockReason(scenario, state, unit, command.to)), "danger");
+      }
       const nextState: BattleState = { ...state, units: { ...state.units, [unit.id]: { ...unit, position: command.to, hasMoved: true } } };
       return finishIfNeeded(scenario, addLog(nextState, `${unit.type.name} меняют позицию.`, "info"));
     }
@@ -90,15 +99,24 @@ export function runBasicAiTurn(scenario: BattleScenario, state: BattleState): Ba
     if (!freshUnit || !canUnitReceiveOrders(freshUnit)) continue;
     const enemies = Object.values(nextState.units).filter((target) => target.sideId !== freshUnit.sideId && target.status !== "destroyed" && target.status !== "routed");
     if (enemies.length === 0) break;
+
     if (!freshUnit.hasAttacked) {
-      const targetInRange = enemies.filter((target) => getCombatPreview(scenario, nextState, freshUnit, target).canAttack).sort((a, b) => a.currentHp - b.currentHp)[0];
+      const engagedTargets = isUnitEngaged(scenario, nextState, freshUnit)
+        ? getAdjacentEnemyUnits(scenario, nextState, freshUnit)
+        : [];
+      const targetInRange = (engagedTargets.length > 0 ? engagedTargets : enemies)
+        .filter((target) => getCombatPreview(scenario, nextState, freshUnit, target).canAttack)
+        .sort((a, b) => a.currentHp - b.currentHp)[0];
       if (targetInRange) {
         nextState = applyBattleCommand(scenario, nextState, { type: "ATTACK_UNIT", attackerId: freshUnit.id, targetId: targetInRange.id });
         continue;
       }
     }
+
     const refreshedAfterAttack = nextState.units[freshUnit.id];
     if (!refreshedAfterAttack || refreshedAfterAttack.hasMoved || !canUnitReceiveOrders(refreshedAfterAttack)) continue;
+    if (isUnitEngaged(scenario, nextState, refreshedAfterAttack)) continue;
+
     const nearestEnemy = enemies.sort((a, b) => hexDistance(refreshedAfterAttack.position, a.position) - hexDistance(refreshedAfterAttack.position, b.position))[0];
     const range = getMovementRange(scenario, nextState, refreshedAfterAttack);
     const bestMove = range.sort((a, b) => hexDistance(a, nearestEnemy.position) - hexDistance(b, nearestEnemy.position))[0];

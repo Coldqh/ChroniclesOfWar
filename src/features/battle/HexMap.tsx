@@ -2,6 +2,7 @@ import type { BattleScenario, BattleStage, BattleState, TerrainData, Unit } from
 import type { HexCoord } from "../../core/hex/hex-types";
 import { hexKey, sameHex } from "../../core/hex/hex-utils";
 import { getBattleMapLayout } from "../../data/maps/battle-map-layouts";
+import { getControlledHexesForSide, isUnitEngaged } from "../../core/engagement/engagement-rules";
 
 type HexMapProps = {
   scenario: BattleScenario;
@@ -64,6 +65,10 @@ export function HexMap({
   const layout = getBattleMapLayout(scenario.id, activeStage.id);
   const metrics = layout.metrics;
   const hasImageUnderlay = layout.mode === "image-underlay" && Boolean(layout.backgroundClassName);
+  const enemySideIds = scenario.sides.map((side) => side.id).filter((sideId) => sideId !== state.playerSideId);
+  const enemyControlledKeys = new Set(
+    enemySideIds.flatMap((sideId) => getControlledHexesForSide(scenario, state, sideId)).map(hexKey),
+  );
 
   function handleTileClick(coord: HexCoord) {
     onInspectTile(coord);
@@ -87,7 +92,7 @@ export function HexMap({
           return;
         }
 
-        onBattleMessage("Отряд выбран.");
+        onBattleMessage(isUnitEngaged(scenario, state, unit) ? "Отряд связан боем." : "Отряд выбран.");
         return;
       }
 
@@ -124,6 +129,16 @@ export function HexMap({
 
     if (selectedUnit.hasMoved) {
       onBattleMessage("Этот отряд уже двигался.");
+      return;
+    }
+
+    if (isUnitEngaged(scenario, state, selectedUnit)) {
+      onBattleMessage("Отряд связан боем.");
+      return;
+    }
+
+    if (enemyControlledKeys.has(key)) {
+      onBattleMessage("Зона контроля врага.");
       return;
     }
 
@@ -165,6 +180,8 @@ export function HexMap({
           const isFriendly = Boolean(activeUnit && activeUnit.sideId === state.playerSideId);
           const isEnemy = Boolean(activeUnit && activeUnit.sideId !== state.playerSideId);
           const isSpent = Boolean(activeUnit && activeUnit.hasMoved && activeUnit.hasAttacked);
+          const engaged = Boolean(activeUnit && isUnitEngaged(scenario, state, activeUnit));
+          const controlledByEnemy = enemyControlledKeys.has(key);
           const inStage =
             tile.coord.q >= activeStage.activeArea.qMin &&
             tile.coord.q <= activeStage.activeArea.qMax &&
@@ -174,7 +191,7 @@ export function HexMap({
           return (
             <button
               key={key}
-              className={`hex-tile terrain-${tile.terrainId} ${isSelected ? "selected" : ""} ${canMove ? "can-move" : ""} ${canTarget ? "can-target" : ""} ${isOccupied ? "occupied" : ""} ${isFriendly ? "friendly" : ""} ${isEnemy ? "enemy" : ""} ${isSpent ? "spent" : ""} ${!inStage ? "out-stage" : ""}`}
+              className={`hex-tile terrain-${tile.terrainId} ${isSelected ? "selected" : ""} ${canMove ? "can-move" : ""} ${canTarget ? "can-target" : ""} ${isOccupied ? "occupied" : ""} ${isFriendly ? "friendly" : ""} ${isEnemy ? "enemy" : ""} ${isSpent ? "spent" : ""} ${engaged ? "engaged" : ""} ${showTerrainDebug && controlledByEnemy ? "enemy-controlled-debug" : ""} ${!inStage ? "out-stage" : ""}`}
               style={{
                 width: metrics.width,
                 height: metrics.height,
